@@ -4,9 +4,29 @@ import { formatTime } from "./utils/formatTime";
 
 type Player = "white" | "black";
 
+type TimeControl = {
+  label: string;
+  minutes: number;
+  increment: number;
+}
+
+const timeControls: TimeControl[] = [
+  { label: "1+0", minutes: 1, increment: 0 },
+  { label: "3+0", minutes: 3, increment: 0 },
+  { label: "3+2", minutes: 3, increment: 2 },
+  { label: "5+0", minutes: 5, increment: 0 },
+  { label: "5+3", minutes: 5, increment: 3 },
+  { label: "10+0", minutes: 10, increment: 0 },
+  { label: "15+10", minutes: 15, increment: 10 },
+  { label: "Custom", minutes: 0, increment: 0 },
+];
+
 function App() {
-  const initialTime = 5 * 60;
+  const [initialTime, setInitialTime] = useState(5 * 60);
   const [increment, setIncrement] = useState(0);
+  const [isCustom, setIsCustom] = useState(false);
+  const [customMinutes, setCustomMinutes] = useState(5);
+  const [customIncrement, setCustomIncrement] = useState(0);
   const [whiteTime, setWhiteTime] = useState(initialTime);
   const [blackTime, setBlackTime] = useState(initialTime);
   const [activePlayer, setActivePlayer] = useState<Player | null>(null);
@@ -14,6 +34,42 @@ function App() {
   const turnStartTime = useRef<number | null>(null);
 
   const [isPaused, setIsPaused] = useState(false);
+
+  function selectTimeControl(control: TimeControl) {
+    if (activePlayer !== null) {
+      return;
+    }
+
+    if (control.label === "Custom") {
+      setIsCustom(true);
+      return;
+    }
+
+    setIsCustom(false);
+
+    const startingTime = control.minutes * 60;
+
+    setInitialTime(startingTime);
+    setIncrement(control.increment);
+
+    setWhiteTime(startingTime);
+    setBlackTime(startingTime);
+  }
+
+  function applyCustomTimeControl() {
+    if (activePlayer !== null) {
+      return;
+    }
+
+    const startingTime = Math.max(customMinutes, 1) * 60;
+    const customIncrementValue = Math.max(customIncrement, 0);
+
+    setInitialTime(startingTime);
+    setIncrement(customIncrementValue);
+
+    setWhiteTime(startingTime);
+    setBlackTime(startingTime);
+  }
 
   useEffect(() => {
     if (activePlayer === null  || isPaused) {
@@ -87,22 +143,50 @@ function App() {
       <h1>Chess clock</h1>
 
       {activePlayer === null && (
-        <label>
-          Increment
-          <select
-            value={increment}
-            onChange={(event) =>
-              setIncrement(Number(event.target.value))
-            }
-          >
-            <option value={0}>No increment</option>
-            <option value={1}>+1 second</option>
-            <option value={2}>+2 seconds</option>
-            <option value={3}>+3 seconds</option>
-            <option value={5}>+5 seconds</option>
-            <option value={10}>+10 seconds</option>
-          </select>
-        </label>
+        <div>
+          <h2>Time control</h2>
+
+          {timeControls.map((control) => (
+            <button
+              key={control.label}
+              onClick={() => selectTimeControl(control)}
+            >
+              {control.label}
+            </button>
+          ))}
+        </div>
+      )}
+
+      {isCustom && activePlayer === null && (
+        <div>
+          <label>
+            Minutes
+            <input
+              type="number"
+              min={1}
+              value={customMinutes}
+              onChange={(event) =>
+                setCustomMinutes(Number(event.target.value))
+              }
+            />
+          </label>
+
+          <label>
+            Increment
+            <input
+              type="number"
+              min={0}
+              value={customIncrement}
+              onChange={(event) =>
+                setCustomIncrement(Number(event.target.value))
+              }
+            />
+          </label>
+
+          <button onClick={applyCustomTimeControl}>
+            Apply custom time
+          </button>
+        </div>
       )}
 
       {activePlayer === null && (
