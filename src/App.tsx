@@ -30,6 +30,7 @@ function App() {
   const [whiteTime, setWhiteTime] = useState(initialTime);
   const [blackTime, setBlackTime] = useState(initialTime);
   const [activePlayer, setActivePlayer] = useState<Player | null>(null);
+  const [winner, setWinner] = useState<Player | null>(null);
 
   const turnStartTime = useRef<number | null>(null);
 
@@ -72,7 +73,7 @@ function App() {
   }
 
   useEffect(() => {
-    if (activePlayer === null  || isPaused) {
+    if (activePlayer === null  || isPaused || winner !== null) {
       return;
     }
 
@@ -92,13 +93,27 @@ function App() {
       turnStartTime.current = now;
 
       if (activePlayer === "white") {
-        setWhiteTime((currentTime) =>
-          Math.max(currentTime - elapsed, 0)
-        );
+        setWhiteTime((currentTime) => {
+          const nextTime = Math.max(currentTime - elapsed, 0);
+
+          if (nextTime === 0) {
+            setWinner("black");
+            setActivePlayer(null);
+          }
+
+          return nextTime;
+        });
       } else {
-        setBlackTime((currentTime) =>
-          Math.max(currentTime - elapsed, 0)
-        );
+        setBlackTime((currentTime) => {
+          const nextTime = Math.max(currentTime - elapsed, 0);
+
+          if (nextTime === 0) {
+            setWinner("white");
+            setActivePlayer(null);
+          }
+
+          return nextTime;
+        });
       }
     }, 100);
 
@@ -133,6 +148,7 @@ function App() {
   function resetGame() {
     setActivePlayer(null);
     setIsPaused(false);
+    setWinner(null);
     setWhiteTime(initialTime);
     setBlackTime(initialTime);
     turnStartTime.current = null;
@@ -189,7 +205,17 @@ function App() {
         </div>
       )}
 
-      {activePlayer === null && (
+      {winner && (
+        <div>
+          <h2>
+            {winner === "white"
+              ? "White wins on time"
+              : "Black wins on time"}
+          </h2>
+        </div>
+      )}
+
+      {activePlayer === null && winner == null && (
         <button onClick={() => setActivePlayer("white")}>
           Start game
         </button>
@@ -202,7 +228,7 @@ function App() {
 
         <button 
           onClick={() => switchTurn("white")}
-          disabled={activePlayer !== "white" || isPaused}
+          disabled={activePlayer !== "white" || isPaused || winner !== null}
         >
           White moved
         </button>
@@ -215,7 +241,7 @@ function App() {
 
         <button 
           onClick={() => switchTurn("black")}
-          disabled={activePlayer !== "black" || isPaused}
+          disabled={activePlayer !== "black" || isPaused || winner !== null}
         >
           Black moved
         </button>
