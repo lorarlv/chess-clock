@@ -115,7 +115,7 @@ function App() {
           return nextTime;
         });
       }
-    }, 100);
+    }, 10);
 
     return () => {
       clearInterval(interval);
@@ -286,7 +286,7 @@ function App() {
 
       <section>
         <h2>White</h2>
-        <p>{formatTime(Math.ceil(whiteTime))}</p>
+        <p>{formatTime(whiteTime)}</p>
         <p>{activePlayer === "white" ? "Active" : "Waiting"}</p>
 
         <button 
@@ -299,7 +299,7 @@ function App() {
 
       <section>
         <h2>Black</h2>
-        <p>{formatTime(Math.ceil(blackTime))}</p>
+        <p>{formatTime(blackTime)}</p>
         <p>{activePlayer === "black" ? "Active" : "Waiting"}</p>
 
         <button 
