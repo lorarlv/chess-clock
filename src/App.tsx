@@ -121,7 +121,70 @@ function App() {
       clearInterval(interval);
       turnStartTime.current = null;
     };
-  }, [activePlayer, isPaused]);
+  }, [activePlayer, isPaused, winner]);
+
+  useEffect(() => {
+    function handleKeyDown(event: KeyboardEvent) {
+      if (event.repeat) {
+        return;
+      }
+      
+      const target = event.target as HTMLElement;
+
+      if (
+        target.tagName === "INPUT" ||
+        target.tagName === "SELECT" ||
+        target.tagName === "TEXTAREA"
+      ) {
+        return;
+      }
+
+      if (event.key.toLowerCase() === "a") {
+        if (
+          activePlayer === "white" &&
+          !isPaused &&
+          winner === null
+        ) {
+          switchTurn("white");
+        }
+
+        return;
+      }
+
+      if (event.key.toLowerCase() === "l") {
+        if (
+          activePlayer === "black" &&
+          !isPaused &&
+          winner === null
+        ) {
+          switchTurn("black");
+        }
+
+        return;
+      }
+
+      if (event.key === " ") {
+        event.preventDefault();
+
+        if (
+          activePlayer !== null &&
+          winner === null
+        ) {
+          setIsPaused((paused) => !paused);
+        }
+      }
+    }
+
+    window.addEventListener("keydown", handleKeyDown);
+
+    return () => {
+      window.removeEventListener("keydown", handleKeyDown);
+    };
+  }, [
+    activePlayer,
+    isPaused,
+    winner,
+  ]);
 
   function switchTurn(player: Player) {
     if (isPaused || activePlayer !== player) {
