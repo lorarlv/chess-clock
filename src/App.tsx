@@ -1,3 +1,5 @@
+import "./App.css"
+
 import { useState, useRef, useEffect } from "react";
 
 import { formatTime } from "./utils/formatTime";
@@ -218,108 +220,202 @@ function App() {
   }
 
   return (
-    <main>
-      <h1>Chess clock</h1>
+    <main className="desktop">
+      <div className="clock-window">
+        <div className="title-bar">
+          <div className="title-bar-left">
+            <span className="title-icon">♟</span>
+            <span>chessclock.exe</span>
+          </div>
 
-      {activePlayer === null && (
-        <div>
-          <h2>Time control</h2>
+          <div className="window-buttons">
+            <button type="button">_</button>
+            <button type="button">□</button>
+            <button type="button">×</button>
+          </div>
+        </div>
 
-          {timeControls.map((control) => (
-            <button
-              key={control.label}
-              onClick={() => selectTimeControl(control)}
+        <div className="menu-bar">
+          <span>Game</span>
+          <span>Clock</span>
+          <span>Settings</span>
+          <span>Help</span>
+        </div>
+
+        <div className="window-content">
+          {activePlayer === null && (
+            <div className="setup-panel">
+              <h2>Time control</h2>
+
+              <div className="time-control-grid">
+                {timeControls.map((control) => (
+                  <button
+                    key={control.label}
+                    className="retro-button"
+                    onClick={() => selectTimeControl(control)}
+                  >
+                    {control.label}
+                  </button>
+                ))}
+              </div>
+
+              {isCustom && (
+                <div className="custom-controls">
+                  <label>
+                    Minutes
+                    <input
+                      type="number"
+                      min={1}
+                      value={customMinutes}
+                      onChange={(event) =>
+                        setCustomMinutes(Number(event.target.value))
+                      }
+                    />
+                  </label>
+
+                  <label>
+                    Increment
+                    <input
+                      type="number"
+                      min={0}
+                      value={customIncrement}
+                      onChange={(event) =>
+                        setCustomIncrement(Number(event.target.value))
+                      }
+                    />
+                  </label>
+
+                  <button
+                    className="retro-button"
+                    onClick={applyCustomTimeControl}
+                  >
+                    Apply
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
+
+          {winner && (
+            <div className="winner-message">
+              {winner === "white"
+                ? "WHITE_WINS_ON_TIME"
+                : "BLACK_WINS_ON_TIME"}
+            </div>
+          )}
+
+          <div className="clock-grid">
+            <section
+              className={`player-panel ${
+                activePlayer === "white" ? "active" : ""
+              }`}
             >
-              {control.label}
+              <div className="player-label">
+                <span className="piece-icon white-piece">♔</span>
+                <span>WHITE</span>
+              </div>
+
+              <div className="clock-display">
+                {formatTime(whiteTime)}
+              </div>
+
+              <div className="player-status">
+                {activePlayer === "white"
+                  ? "YOUR MOVE"
+                  : "WAITING"}
+              </div>
+
+              <button
+                className="player-button"
+                onClick={() => switchTurn("white")}
+                disabled={
+                  activePlayer !== "white" ||
+                  isPaused ||
+                  winner !== null
+                }
+              >
+                [ A ] WHITE MOVED
+              </button>
+            </section>
+
+            <section
+              className={`player-panel ${
+                activePlayer === "black" ? "active" : ""
+              }`}
+            >
+              <div className="player-label">
+                <span className="piece-icon black-piece">♔</span>
+                <span>BLACK</span>
+              </div>
+
+              <div className="clock-display">
+                {formatTime(blackTime)}
+              </div>
+
+              <div className="player-status">
+                {activePlayer === "black"
+                  ? "YOUR MOVE"
+                  : "WAITING"}
+              </div>
+
+              <button
+                className="player-button"
+                onClick={() => switchTurn("black")}
+                disabled={
+                  activePlayer !== "black" ||
+                  isPaused ||
+                  winner !== null
+                }
+              >
+                [ L ] BLACK MOVED
+              </button>
+            </section>
+          </div>
+
+          <div className="control-row">
+            {activePlayer === null && winner === null ? (
+              <button
+                className="retro-button primary-button"
+                onClick={() => setActivePlayer("white")}
+              >
+                START GAME
+              </button>
+            ) : (
+              <button
+                className="retro-button"
+                onClick={togglePause}
+                disabled={activePlayer === null}
+              >
+                {isPaused ? "RESUME" : "PAUSE"}
+              </button>
+            )}
+
+            <button
+              className="retro-button"
+              onClick={resetGame}
+            >
+              RESET
             </button>
-          ))}
+          </div>
         </div>
-      )}
 
-      {isCustom && activePlayer === null && (
-        <div>
-          <label>
-            Minutes
-            <input
-              type="number"
-              min={1}
-              value={customMinutes}
-              onChange={(event) =>
-                setCustomMinutes(Number(event.target.value))
-              }
-            />
-          </label>
+        <div className="status-bar">
+          <span>
+            TIME CONTROL: {Math.round(initialTime / 60)}+
+            {increment}
+          </span>
 
-          <label>
-            Increment
-            <input
-              type="number"
-              min={0}
-              value={customIncrement}
-              onChange={(event) =>
-                setCustomIncrement(Number(event.target.value))
-              }
-            />
-          </label>
-
-          <button onClick={applyCustomTimeControl}>
-            Apply custom time
-          </button>
+          <span>
+            {winner
+              ? "GAME OVER"
+              : isPaused
+                ? "PAUSED"
+                : activePlayer
+                  ? "GAME IN PROGRESS"
+                  : "READY"}
+          </span>
         </div>
-      )}
-
-      {winner && (
-        <div>
-          <h2>
-            {winner === "white"
-              ? "White wins on time"
-              : "Black wins on time"}
-          </h2>
-        </div>
-      )}
-
-      {activePlayer === null && winner == null && (
-        <button onClick={() => setActivePlayer("white")}>
-          Start game
-        </button>
-      )}
-
-      <section>
-        <h2>White</h2>
-        <p>{formatTime(whiteTime)}</p>
-        <p>{activePlayer === "white" ? "Active" : "Waiting"}</p>
-
-        <button 
-          onClick={() => switchTurn("white")}
-          disabled={activePlayer !== "white" || isPaused || winner !== null}
-        >
-          White moved
-        </button>
-      </section>
-
-      <section>
-        <h2>Black</h2>
-        <p>{formatTime(blackTime)}</p>
-        <p>{activePlayer === "black" ? "Active" : "Waiting"}</p>
-
-        <button 
-          onClick={() => switchTurn("black")}
-          disabled={activePlayer !== "black" || isPaused || winner !== null}
-        >
-          Black moved
-        </button>
-      </section>
-
-      <button
-        onClick={togglePause}
-        disabled={activePlayer === null}
-      >
-        {isPaused ? "Resume" : "Pause"}
-      </button>
-
-      <button onClick={resetGame}>
-        Reset
-      </button>
+      </div>
     </main>
   );
 }
