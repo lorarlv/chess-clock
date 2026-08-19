@@ -238,8 +238,19 @@ function App() {
         <div className="menu-bar">
           <span>Game</span>
           <span>Clock</span>
-          <span>Settings</span>
-          <span>Help</span>
+          <span>Options</span>
+          <span>?</span>
+        </div>
+
+        <div className="program-banner">
+          <div>
+            <strong>CHESS CLOCK</strong>
+            <span> version 1.0</span>
+          </div>
+
+          <span className="program-message">
+            DON'T WASTE YOUR TIME
+          </span>
         </div>
 
         <div className="window-content">
@@ -296,6 +307,10 @@ function App() {
             </div>
           )}
 
+          <span className="keyboard-status">
+            KEYBOARD: A / L / SPACE
+          </span>
+
           {winner && (
             <div className="winner-message">
               {winner === "white"
@@ -311,6 +326,12 @@ function App() {
               }`}
             >
               <div className="player-label">
+                <span
+                  className={`status-light ${
+                    activePlayer === "white" ? "on" : ""
+                  }`}
+                />
+
                 <span className="piece-icon white-piece">♔</span>
                 <span>WHITE</span>
               </div>
@@ -344,6 +365,12 @@ function App() {
               }`}
             >
               <div className="player-label">
+                <span
+                  className={`status-light ${
+                    activePlayer === "black" ? "on" : ""
+                  }`}
+                />
+
                 <span className="piece-icon black-piece">♔</span>
                 <span>BLACK</span>
               </div>

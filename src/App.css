@@ -95,6 +95,32 @@ input {
   font-size: 0.85rem;
 }
 
+.program-banner {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  padding: 7px 10px;
+  border-top: 1px solid #eee;
+  border-bottom: 1px solid #777;
+  background: #b8b5a8;
+  font-family: "Lucida Console", monospace;
+  font-size: 0.7rem;
+}
+
+.program-banner strong {
+  letter-spacing: 0.08rem;
+}
+
+.program-banner span {
+  color: #454545;
+}
+
+.program-message {
+  font-size: 0.65rem;
+  letter-spacing: 0.08rem;
+}
+
 .window-content {
   padding: 24px;
 }
@@ -180,6 +206,22 @@ input {
   font-weight: 700;
 }
 
+.status-light {
+  width: 7px;
+  height: 7px;
+  border: 1px solid #444;
+  border-radius: 50%;
+  background: #65655f;
+  box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.6);
+}
+
+.status-light.on {
+  background: #d5b947;
+  box-shadow:
+    0 0 3px #d5b947,
+    inset 1px 1px 1px rgba(255, 255, 255, 0.5);
+}
+
 .piece-icon {
   display: inline-flex;
   align-items: center;
@@ -201,15 +243,37 @@ input {
 }
 
 .clock-display {
+  position: relative;
   padding: 18px 12px;
-  border: 3px inset #777;
+
+  border-top: 4px solid #55584f;
+  border-left: 4px solid #55584f;
+  border-right: 4px solid #d7d5c9;
+  border-bottom: 4px solid #d7d5c9;
+
   background: #151813;
   color: #c9d8a0;
   font-family: "Lucida Console", "Courier New", monospace;
   font-size: clamp(3rem, 8vw, 5.5rem);
   font-weight: 700;
-  letter-spacing: -0.06em;
+  letter-spacing: -0.08em;
   text-shadow: 2px 0 #536246;
+  box-shadow: inset 3px 3px 8px rgba(0, 0, 0, 0.65);
+}
+
+.clock-display:after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background:
+    repeating-linear-gradient(
+      0deg,
+      transparent 0,
+      transparent 3px,
+      rgba(255, 255, 255, 0.018) 3px,
+      rgba(255, 255, 255, 0.018) 4px
+    )
 }
 
 .player-status {
@@ -311,5 +375,13 @@ input {
   .status-bar {
     flex-direction: column;
     gap: 3px;
+  }
+
+  .keyboard-status {
+    display: none;
+  }
+
+  .program-message {
+    display: none;
   }
 }
