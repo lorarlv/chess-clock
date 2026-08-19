@@ -6,6 +6,7 @@ type Player = "white" | "black";
 
 function App() {
   const initialTime = 5 * 60;
+  const [increment, setIncrement] = useState(0);
   const [whiteTime, setWhiteTime] = useState(initialTime);
   const [blackTime, setBlackTime] = useState(initialTime);
   const [activePlayer, setActivePlayer] = useState<Player | null>(null);
@@ -51,6 +52,20 @@ function App() {
     };
   }, [activePlayer, isPaused]);
 
+  function switchTurn(player: Player) {
+    if (isPaused || activePlayer !== player) {
+      return;
+    }
+
+    if (player === "white") {
+      setWhiteTime((currentTime) => currentTime + increment);
+      setActivePlayer("black");
+    } else {
+      setBlackTime((currentTime) => currentTime + increment);
+      setActivePlayer("white");
+    }
+  }
+
   function togglePause() {
     if (activePlayer === null) {
       return;
@@ -72,6 +87,25 @@ function App() {
       <h1>Chess clock</h1>
 
       {activePlayer === null && (
+        <label>
+          Increment
+          <select
+            value={increment}
+            onChange={(event) =>
+              setIncrement(Number(event.target.value))
+            }
+          >
+            <option value={0}>No increment</option>
+            <option value={1}>+1 second</option>
+            <option value={2}>+2 seconds</option>
+            <option value={3}>+3 seconds</option>
+            <option value={5}>+5 seconds</option>
+            <option value={10}>+10 seconds</option>
+          </select>
+        </label>
+      )}
+
+      {activePlayer === null && (
         <button onClick={() => setActivePlayer("white")}>
           Start game
         </button>
@@ -83,7 +117,7 @@ function App() {
         <p>{activePlayer === "white" ? "Active" : "Waiting"}</p>
 
         <button 
-          onClick={() => setActivePlayer("black")}
+          onClick={() => switchTurn("white")}
           disabled={activePlayer !== "white" || isPaused}
         >
           White moved
@@ -96,7 +130,7 @@ function App() {
         <p>{activePlayer === "black" ? "Active" : "Waiting"}</p>
 
         <button 
-          onClick={() => setActivePlayer("white")}
+          onClick={() => switchTurn("black")}
           disabled={activePlayer !== "black" || isPaused}
         >
           Black moved
