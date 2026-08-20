@@ -24,7 +24,13 @@ body {
 }
 
 .pixel-icon.white-king .pixel.filled {
-  background: #eee9d8;
+  background: #fffdf0;
+}
+
+.pixel-icon.white-king {
+  filter:
+    drop-shadow(1px 0 0 #333)
+    drop-shadow(0 1px 0 #333);
 }
 
 .pixel-icon.black-king .pixel.filled {
