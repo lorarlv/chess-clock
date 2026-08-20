@@ -28,21 +28,27 @@ type PressureState =
   | "normal"
   | "low"
   | "critical"
-  | "terminal";
+  | "terminal"
+  | "crashed";
 
 function getPressureState(
   time: number,
-  isActive: boolean
+  isActive: boolean,
+  hasTimedOut: boolean
 ): PressureState {
+  if (hasTimedOut) {
+    return "crashed";
+  }
+
   if (!isActive) {
     return "normal";
   }
 
-  if (time <= 5) {
+  if (time <= 7) {
     return "terminal";
   }
 
-  if (time <= 10) {
+  if (time <= 15) {
     return "critical";
   }
 
@@ -51,6 +57,185 @@ function getPressureState(
   }
 
   return "normal";
+}
+
+const LOW_TIME_TEXT = "TIME IS RUNNING OUT";
+const CRITICAL_TIME_TEXT = "T_ME///CR_T_CAL";
+
+function corruptStatusText(
+  text: string,
+  time: number
+): string {
+  if (time > 30) {
+    return text;
+  }
+
+  const chars = [...text];
+  const validIndexes = chars
+    .map((char, index) => char === " " ? -1 : index)
+    .filter((index) => index !== -1);
+
+  // 30s -> 20s
+  if (time > 20) {
+    const progress = (30 - time) / 10;
+
+    const interval = 2.4 - progress * 1.5;
+
+    const duration = 0.08 + progress * 0.08;
+
+    const elapsed = 30 - time;
+    const cycle = Math.floor(elapsed / interval);
+    const phase = elapsed % interval;
+
+    if (phase < duration) {
+      const index =
+        validIndexes[
+          cycle % validIndexes.length
+        ];
+
+      chars[index] = "_";
+    }
+
+    return chars.join("");
+  }
+  
+  // 20s -> 7s
+  if (time > 7) {
+    const progress = (20 - time) / 13;
+
+    const updateRate =
+      3 + progress * 9;
+
+    const intensity =
+      0.08 + progress * 0.42;
+
+    const frame = Math.floor(
+      time * updateRate
+    );
+
+    return chars
+      .map((char, index) => {
+        if (char === " ") {
+          return char;
+        }
+
+        const seed =
+          Math.sin(
+            index * 12.9898 +
+            frame * 78.233
+          ) * 43758.5453;
+
+        const random =
+          seed - Math.floor(seed);
+
+        if (random > intensity) {
+          return char;
+        }
+
+        const variants = [
+          "_",
+          "_",
+          "_",
+          "/",
+          "|",
+          char,
+          char,
+          char,
+          char,
+        ];
+
+        return variants[
+          Math.floor(
+            random * variants.length
+          )
+        ];
+      })
+      .join("");
+  }
+
+  // final 7s
+  const criticalChars = [
+    ..."T_ME///CR_T_CAL"
+  ];
+
+  const progress = (7 - time) / 7;
+  const updateRate = 9 + progress * 10;
+  const intensity = 0.12 + progress * 0.3;
+
+  const frame = Math.floor(
+    time * updateRate
+  );
+
+  return criticalChars
+    .map((char, index) => {
+      if (char === " ") {
+        return char;
+      }
+
+      const seed =
+        Math.sin(
+          index * 17.123 +
+          frame * 63.417
+        ) * 43758.5453;
+
+      const random =
+        seed - Math.floor(seed);
+
+      if (random > intensity) {
+        return char;
+      }
+
+      const variants = [
+        "_",
+        "/",
+        "|",
+        char,
+        char,
+        char,
+      ];
+
+      return variants[
+        Math.floor(
+          random * variants.length
+        )
+      ];
+    })
+    .join("");
+}
+
+function getPlayerStatus(
+  time: number,
+  isActive: boolean,
+  isPaused: boolean,
+  hasTimedOut: boolean
+): string {
+  if (hasTimedOut) {
+    return "CLOCK FAILURE";
+  }
+
+  if (!isActive) {
+    return "WAITING";
+  }
+
+  if (isPaused) {
+    return "PAUSED";
+  }
+
+  if (time <= 7) {
+    return corruptStatusText(
+      CRITICAL_TIME_TEXT,
+      time
+    );
+  }
+
+  if (time <= 30) {
+    return corruptStatusText(
+      LOW_TIME_TEXT,
+      time
+    );
+  }
+
+  return "YOUR MOVE";
 }
 
 function App() {
@@ -251,12 +436,28 @@ function App() {
 
   const whitePressure = getPressureState(
     whiteTime,
-    activePlayer === "white" && !isPaused
+    activePlayer === "white" && !isPaused,
+    winner === "black"
   );
 
   const blackPressure = getPressureState(
     blackTime,
-    activePlayer === "black" && !isPaused
+    activePlayer === "black" && !isPaused,
+    winner === "white"
+  );
+
+  const whiteStatus = getPlayerStatus(
+    whiteTime,
+    activePlayer === "white",
+    isPaused,
+    winner === "black"
+  );
+
+  const blackStatus = getPlayerStatus(
+    blackTime,
+    activePlayer === "black",
+    isPaused,
+    winner === "white"
   );
 
   return (
@@ -383,11 +584,7 @@ function App() {
               </div>
 
               <div className="player-status">
-                {activePlayer === "white"
-                  ? whitePressure === "low"
-                    ? "TIME IS RUNNING OUT"
-                    : "YOUR MOVE"
-                  : "WAITING"}
+                {whiteStatus}
               </div>
 
               <button
@@ -426,11 +623,7 @@ function App() {
               </div>
 
               <div className="player-status">
-                {activePlayer === "black"
-                  ? blackPressure === "low"
-                    ? "TIME IS RUNNING OUT"
-                    : "YOUR MOVE"
-                  : "WAITING"}
+                {blackStatus}
               </div>
 
               <button
