@@ -395,6 +395,83 @@ input {
   font-weight: 700;
 }
 
+.player-panel.low .clock-value {
+  display: inline-block;
+  animation:
+    low-time-flicker 3.7s steps(1, end) infinite,
+    low-time-jitter 5.3s steps(1, end) infinite;
+}
+
+@keyframes low-time-flicker {
+  0%,
+  17% {
+    filter: none;
+  }
+
+  18% {
+    filter: brightness(0.68);
+  }
+
+  19% {
+    filter: brightness(1.16);
+  }
+
+  20% {
+    filter: none;
+  }
+
+  21% {
+    filter: brightness(0.88);
+  }
+
+  22%,
+  61% {
+    filter: none;
+  }
+
+  62% {
+    filter: brightness(1.12);
+  }
+
+  63% {
+    filter: brightness(0.76);
+  }
+
+  64%,
+  66% {
+    filter: none;
+  }
+
+  67% {
+    filter: brightness(0.91);
+  }
+
+  68%,
+  100% {
+    filter: none;
+  }
+}
+
+@keyframes low-time-jitter {
+  0%,
+  43% {
+    transform: translate(0, 0);
+  }
+
+  44% {
+    transform: translate(1px, 0);
+  }
+
+  45% {
+    transform: translate(-1px, 0);
+  }
+
+  46%,
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
 @media (max-width: 650px) {
   .desktop {
     padding: 20px 10px;

@@ -24,6 +24,35 @@ const timeControls: TimeControl[] = [
   { label: "Custom", minutes: 0, increment: 0 },
 ];
 
+type PressureState =
+  | "normal"
+  | "low"
+  | "critical"
+  | "terminal";
+
+function getPressureState(
+  time: number,
+  isActive: boolean
+): PressureState {
+  if (!isActive) {
+    return "normal";
+  }
+
+  if (time <= 5) {
+    return "terminal";
+  }
+
+  if (time <= 10) {
+    return "critical";
+  }
+
+  if (time <= 30) {
+    return "low";
+  }
+
+  return "normal";
+}
+
 function App() {
   const [initialTime, setInitialTime] = useState(5 * 60);
   const [increment, setIncrement] = useState(0);
@@ -220,6 +249,16 @@ function App() {
     turnStartTime.current = null;
   }
 
+  const whitePressure = getPressureState(
+    whiteTime,
+    activePlayer === "white" && !isPaused
+  );
+
+  const blackPressure = getPressureState(
+    blackTime,
+    activePlayer === "black" && !isPaused
+  );
+
   return (
     <main className="desktop">
       <div className="clock-window">
@@ -322,7 +361,7 @@ function App() {
 
           <div className="clock-grid">
             <section
-              className={`player-panel ${
+              className={`player-panel ${whitePressure} ${
                 activePlayer === "white" ? "active" : ""
               }`}
             >
@@ -338,12 +377,16 @@ function App() {
               </div>
 
               <div className="clock-display">
-                {formatTime(whiteTime)}
+                <span className="clock-value">
+                  {formatTime(whiteTime)}
+                </span>
               </div>
 
               <div className="player-status">
                 {activePlayer === "white"
-                  ? "YOUR MOVE"
+                  ? whitePressure === "low"
+                    ? "TIME IS RUNNING OUT"
+                    : "YOUR MOVE"
                   : "WAITING"}
               </div>
 
@@ -361,7 +404,7 @@ function App() {
             </section>
 
             <section
-              className={`player-panel ${
+              className={`player-panel ${blackPressure} ${
                 activePlayer === "black" ? "active" : ""
               }`}
             >
@@ -377,12 +420,16 @@ function App() {
               </div>
 
               <div className="clock-display">
-                {formatTime(blackTime)}
+                <span className="clock-value">
+                  {formatTime(blackTime)}
+                </span>
               </div>
 
               <div className="player-status">
                 {activePlayer === "black"
-                  ? "YOUR MOVE"
+                  ? blackPressure === "low"
+                    ? "TIME IS RUNNING OUT"
+                    : "YOUR MOVE"
                   : "WAITING"}
               </div>
 
