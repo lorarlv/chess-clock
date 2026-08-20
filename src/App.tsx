@@ -1,4 +1,5 @@
 import "./App.css"
+import PixelIcon from "./components/pixel";
 
 import { useState, useRef, useEffect } from "react";
 
@@ -224,7 +225,7 @@ function App() {
       <div className="clock-window">
         <div className="title-bar">
           <div className="title-bar-left">
-            <span className="title-icon">♟</span>
+            <PixelIcon type="app" />
             <span>chessclock.exe</span>
           </div>
 
@@ -332,7 +333,7 @@ function App() {
                   }`}
                 />
 
-                <span className="piece-icon white-piece">♔</span>
+                <PixelIcon type="white-king" />
                 <span>WHITE</span>
               </div>
 
@@ -371,7 +372,7 @@ function App() {
                   }`}
                 />
 
-                <span className="piece-icon black-piece">♔</span>
+                <PixelIcon type="black-king" />
                 <span>BLACK</span>
               </div>
 
