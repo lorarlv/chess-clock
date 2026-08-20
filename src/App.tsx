@@ -1,7 +1,7 @@
 import "./App.css"
 import PixelIcon from "./components/pixel";
 
-import { useState, useRef, useEffect } from "react";
+import React, { useState, useRef, useEffect } from "react";
 
 import { formatTime } from "./utils/formatTime";
 
@@ -247,6 +247,21 @@ function getPlayerStatus(
 function App() {
   const [initialTime, setInitialTime] = useState(5 * 60);
   const [increment, setIncrement] = useState(0);
+
+  const [windowPosition, setWindowPosition] = useState({
+    x: 0,
+    y: 0,
+  });
+
+  const dragStart = useRef({
+    pointerX: 0,
+    pointerY: 0,
+    windowX: 0,
+    windowY: 0,
+  });
+
+  const [isDragging, setIsDragging] = useState(false);
+
   const [isCustom, setIsCustom] = useState(false);
   const [customMinutes, setCustomMinutes] = useState(5);
   const [customIncrement, setCustomIncrement] = useState(0);
@@ -260,6 +275,58 @@ function App() {
   const [isPaused, setIsPaused] = useState(false);
 
   const [crashPhase, setCrashPhase] = useState<CrashPhase>("idle");
+
+  function startDragging(event: React.PointerEvent<HTMLDivElement>) {
+    if (
+      (event.target as HTMLElement).closest(".window-buttons")
+    ) {
+      return;
+    }
+
+    dragStart.current = {
+      pointerX: event.clientX,
+      pointerY: event.clientY,
+      windowX: windowPosition.x,
+      windowY: windowPosition.y,
+    };
+
+    setIsDragging(true);
+
+    event.currentTarget.setPointerCapture(
+      event.pointerId
+    );
+  }
+
+  function dragWindow(event: React.PointerEvent<HTMLDivElement>) {
+    if (!isDragging) {
+      return;
+    }
+
+    const deltaX =
+      event.clientX - dragStart.current.pointerX;
+
+    const deltaY =
+      event.clientY - dragStart.current.pointerY;
+
+    setWindowPosition({
+      x: dragStart.current.windowX + deltaX,
+      y: dragStart.current.windowY + deltaY,
+    });
+  }
+
+  function stopDragging(
+    event: React.PointerEvent<HTMLDivElement>
+  ) {
+    if (!isDragging) {
+      return;
+    }
+
+    setIsDragging(false);
+
+    event.currentTarget.releasePointerCapture(
+      event.pointerId
+    );
+  }
 
   function selectTimeControl(control: TimeControl) {
     if (activePlayer !== null) {
@@ -483,8 +550,24 @@ function App() {
 
   return (
     <main className="desktop">
-      <div className="clock-window">
-        <div className="title-bar">
+      <div 
+        className={`clock-window ${
+          isDragging ? "dragging" : ""
+        }`}
+        style={{
+          transform: `translate(
+            ${windowPosition.x}px,
+            ${windowPosition.y}px
+          )`,
+        }}
+      >
+        <div 
+          className="title-bar"
+          onPointerDown={startDragging}
+          onPointerMove={dragWindow}
+          onPointerUp={stopDragging}
+          onPointerCancel={stopDragging}
+        >
           <div className="title-bar-left">
             <PixelIcon type="app" />
             <span>chessclock.exe</span>

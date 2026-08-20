@@ -37,6 +37,14 @@
   font-family: Arial, sans-serif;
   font-size: 0.9rem;
   font-weight: 700;
+
+  cursor: grab;
+  user-select: none;
+  touch-action: none;
+}
+
+.clock-window.dragging .title-bar {
+  cursor: grabbing;
 }
 
 .title-bar-left {
