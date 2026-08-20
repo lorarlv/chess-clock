@@ -1,17 +1,27 @@
-import "./App.css"
-import PixelIcon from "./components/pixel";
+import "./App.css";
 
-import React, { useState, useRef, useEffect } from "react";
+import { useEffect, useRef, useState } from "react";
 
-import { formatTime } from "./utils/formatTime";
+import Clock from "./components/clock";
+import TimeControls from "./components/timeControls";
+import WindowChrome from "./components/windowChrome";
+
+import type { TimeControl } from "./components/timeControls";
+
+import { useDraggableWindow } from "./hooks/useDraggableWindow";
+
+import {
+  getPlayerStatus,
+  getPressureState,
+} from "./utils/pressure";
+
+import type {
+  CrashPhase,
+} from "./utils/pressure";
+
 
 type Player = "white" | "black";
 
-type TimeControl = {
-  label: string;
-  minutes: number;
-  increment: number;
-}
 
 const timeControls: TimeControl[] = [
   { label: "1+0", minutes: 1, increment: 0 },
@@ -24,309 +34,36 @@ const timeControls: TimeControl[] = [
   { label: "Custom", minutes: 0, increment: 0 },
 ];
 
-type PressureState =
-  | "normal"
-  | "low"
-  | "critical"
-  | "terminal"
-  | "crashed";
-
-type CrashPhase = "idle" | "burst" | "settled";
-
-function getPressureState(
-  time: number,
-  isActive: boolean,
-  hasTimedOut: boolean
-): PressureState {
-  if (hasTimedOut) {
-    return "crashed";
-  }
-
-  if (!isActive) {
-    return "normal";
-  }
-
-  if (time <= 7) {
-    return "terminal";
-  }
-
-  if (time <= 15) {
-    return "critical";
-  }
-
-  if (time <= 30) {
-    return "low";
-  }
-
-  return "normal";
-}
-
-const LOW_TIME_TEXT = "TIME IS RUNNING OUT";
-const CRITICAL_TIME_TEXT = "T_ME///CR_T_CAL";
-
-function corruptStatusText(
-  text: string,
-  time: number
-): string {
-  if (time > 30) {
-    return text;
-  }
-
-  const chars = [...text];
-  const validIndexes = chars
-    .map((char, index) => char === " " ? -1 : index)
-    .filter((index) => index !== -1);
-
-  // 30s -> 20s
-  if (time > 20) {
-    const progress = (30 - time) / 10;
-
-    const interval = 2.4 - progress * 1.5;
-
-    const duration = 0.08 + progress * 0.08;
-
-    const elapsed = 30 - time;
-    const cycle = Math.floor(elapsed / interval);
-    const phase = elapsed % interval;
-
-    if (phase < duration) {
-      const index =
-        validIndexes[
-          cycle % validIndexes.length
-        ];
-
-      chars[index] = "_";
-    }
-
-    return chars.join("");
-  }
-  
-  // 20s -> 7s
-  if (time > 7) {
-    const progress = (20 - time) / 13;
-
-    const updateRate =
-      3 + progress * 9;
-
-    const intensity =
-      0.08 + progress * 0.42;
-
-    const frame = Math.floor(
-      time * updateRate
-    );
-
-    return chars
-      .map((char, index) => {
-        if (char === " ") {
-          return char;
-        }
-
-        const seed =
-          Math.sin(
-            index * 12.9898 +
-            frame * 78.233
-          ) * 43758.5453;
-
-        const random =
-          seed - Math.floor(seed);
-
-        if (random > intensity) {
-          return char;
-        }
-
-        const variants = [
-          "_",
-          "_",
-          "_",
-          "/",
-          "|",
-          char,
-          char,
-          char,
-          char,
-        ];
-
-        return variants[
-          Math.floor(
-            random * variants.length
-          )
-        ];
-      })
-      .join("");
-  }
-
-  // final 7s
-  const criticalChars = [
-    ..."T_ME///CR_T_CAL"
-  ];
-
-  const progress = (7 - time) / 7;
-  const updateRate = 9 + progress * 10;
-  const intensity = 0.12 + progress * 0.3;
-
-  const frame = Math.floor(
-    time * updateRate
-  );
-
-  return criticalChars
-    .map((char, index) => {
-      if (char === " ") {
-        return char;
-      }
-
-      const seed =
-        Math.sin(
-          index * 17.123 +
-          frame * 63.417
-        ) * 43758.5453;
-
-      const random =
-        seed - Math.floor(seed);
-
-      if (random > intensity) {
-        return char;
-      }
-
-      const variants = [
-        "_",
-        "/",
-        "|",
-        char,
-        char,
-        char,
-      ];
-
-      return variants[
-        Math.floor(
-          random * variants.length
-        )
-      ];
-    })
-    .join("");
-}
-
-function getPlayerStatus(
-  time: number,
-  isActive: boolean,
-  isPaused: boolean,
-  hasTimedOut: boolean,
-  crashPhase: CrashPhase
-): string {
-  if (hasTimedOut) {
-    if (crashPhase === "burst") {
-      return "TIME EXPIRED";
-    }
-    return "CLOCK FAILURE";
-  }
-
-  if (!isActive) {
-    return "WAITING";
-  }
-
-  if (isPaused) {
-    return "PAUSED";
-  }
-
-  if (time <= 7) {
-    return corruptStatusText(
-      CRITICAL_TIME_TEXT,
-      time
-    );
-  }
-
-  if (time <= 30) {
-    return corruptStatusText(
-      LOW_TIME_TEXT,
-      time
-    );
-  }
-
-  return "YOUR MOVE";
-}
 
 function App() {
   const [initialTime, setInitialTime] = useState(5 * 60);
   const [increment, setIncrement] = useState(0);
 
-  const [windowPosition, setWindowPosition] = useState({
-    x: 0,
-    y: 0,
-  });
-
-  const dragStart = useRef({
-    pointerX: 0,
-    pointerY: 0,
-    windowX: 0,
-    windowY: 0,
-  });
-
-  const [isDragging, setIsDragging] = useState(false);
-
-  const [isCustom, setIsCustom] = useState(false);
-  const [customMinutes, setCustomMinutes] = useState(5);
-  const [customIncrement, setCustomIncrement] = useState(0);
   const [whiteTime, setWhiteTime] = useState(initialTime);
   const [blackTime, setBlackTime] = useState(initialTime);
-  const [activePlayer, setActivePlayer] = useState<Player | null>(null);
-  const [winner, setWinner] = useState<Player | null>(null);
 
-  const turnStartTime = useRef<number | null>(null);
+  const [activePlayer, setActivePlayer] = useState<Player | null>(null);
+
+  const [winner, setWinner] = useState<Player | null>(null);
 
   const [isPaused, setIsPaused] = useState(false);
 
   const [crashPhase, setCrashPhase] = useState<CrashPhase>("idle");
 
-  function startDragging(event: React.PointerEvent<HTMLDivElement>) {
-    if (
-      (event.target as HTMLElement).closest(".window-buttons")
-    ) {
-      return;
-    }
+  const [isCustom, setIsCustom] = useState(false);
+  const [customMinutes, setCustomMinutes] = useState(5);
+  const [customIncrement, setCustomIncrement] = useState(0);
 
-    dragStart.current = {
-      pointerX: event.clientX,
-      pointerY: event.clientY,
-      windowX: windowPosition.x,
-      windowY: windowPosition.y,
-    };
+  const turnStartTime = useRef<number | null>(null);
 
-    setIsDragging(true);
+  const {
+    windowPosition,
+    isDragging,
+    startDragging,
+    dragWindow,
+    stopDragging,
+  } = useDraggableWindow();
 
-    event.currentTarget.setPointerCapture(
-      event.pointerId
-    );
-  }
-
-  function dragWindow(event: React.PointerEvent<HTMLDivElement>) {
-    if (!isDragging) {
-      return;
-    }
-
-    const deltaX =
-      event.clientX - dragStart.current.pointerX;
-
-    const deltaY =
-      event.clientY - dragStart.current.pointerY;
-
-    setWindowPosition({
-      x: dragStart.current.windowX + deltaX,
-      y: dragStart.current.windowY + deltaY,
-    });
-  }
-
-  function stopDragging(
-    event: React.PointerEvent<HTMLDivElement>
-  ) {
-    if (!isDragging) {
-      return;
-    }
-
-    setIsDragging(false);
-
-    event.currentTarget.releasePointerCapture(
-      event.pointerId
-    );
-  }
 
   function selectTimeControl(control: TimeControl) {
     if (activePlayer !== null) {
@@ -349,13 +86,17 @@ function App() {
     setBlackTime(startingTime);
   }
 
+
   function applyCustomTimeControl() {
     if (activePlayer !== null) {
       return;
     }
 
-    const startingTime = Math.max(customMinutes, 1) * 60;
-    const customIncrementValue = Math.max(customIncrement, 0);
+    const startingTime =
+      Math.max(customMinutes, 1) * 60;
+
+    const customIncrementValue =
+      Math.max(customIncrement, 0);
 
     setInitialTime(startingTime);
     setIncrement(customIncrementValue);
@@ -364,8 +105,67 @@ function App() {
     setBlackTime(startingTime);
   }
 
+
+  function switchTurn(player: Player) {
+    if (
+      isPaused ||
+      activePlayer !== player ||
+      winner !== null
+    ) {
+      return;
+    }
+
+    if (player === "white") {
+      setWhiteTime(
+        (currentTime) =>
+          currentTime + increment
+      );
+
+      setActivePlayer("black");
+    } else {
+      setBlackTime(
+        (currentTime) =>
+          currentTime + increment
+      );
+
+      setActivePlayer("white");
+    }
+  }
+
+
+  function togglePause() {
+    if (
+      activePlayer === null ||
+      winner !== null
+    ) {
+      return;
+    }
+
+    setIsPaused(
+      (paused) => !paused
+    );
+  }
+
+
+  function resetGame() {
+    setActivePlayer(null);
+    setIsPaused(false);
+    setWinner(null);
+    setCrashPhase("idle");
+
+    setWhiteTime(initialTime);
+    setBlackTime(initialTime);
+
+    turnStartTime.current = null;
+  }
+
+
   useEffect(() => {
-    if (activePlayer === null  || isPaused || winner !== null) {
+    if (
+      activePlayer === null ||
+      isPaused ||
+      winner !== null
+    ) {
       return;
     }
 
@@ -386,32 +186,36 @@ function App() {
 
       if (activePlayer === "white") {
         setWhiteTime((currentTime) => {
-          const nextTime = Math.max(currentTime - elapsed, 0);
+          const nextTime =
+            Math.max(
+              currentTime - elapsed,
+              0
+            );
 
           if (nextTime === 0) {
             setCrashPhase("burst");
             setWinner("black");
             setActivePlayer(null);
 
-            setTimeout(() => {
-              setCrashPhase("settled");
-            }, 2800);
+            setTimeout(() => {setCrashPhase("settled")}, 2800);
           }
 
           return nextTime;
         });
       } else {
         setBlackTime((currentTime) => {
-          const nextTime = Math.max(currentTime - elapsed, 0);
+          const nextTime =
+            Math.max(
+              currentTime - elapsed,
+              0
+            );
 
           if (nextTime === 0) {
             setCrashPhase("burst");
             setWinner("white");
             setActivePlayer(null);
 
-            setTimeout(() => {
-              setCrashPhase("settled");
-            }, 2800);
+            setTimeout(() => {setCrashPhase("settled")}, 2800);
           }
 
           return nextTime;
@@ -423,15 +227,21 @@ function App() {
       clearInterval(interval);
       turnStartTime.current = null;
     };
-  }, [activePlayer, isPaused, winner]);
+  }, [
+    activePlayer,
+    isPaused,
+    winner,
+  ]);
+
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
       if (event.repeat) {
         return;
       }
-      
-      const target = event.target as HTMLElement;
+
+      const target =
+        event.target as HTMLElement;
 
       if (
         target.tagName === "INPUT" ||
@@ -441,7 +251,9 @@ function App() {
         return;
       }
 
-      if (event.key.toLowerCase() === "a") {
+      if (
+        event.key.toLowerCase() === "a"
+      ) {
         if (
           activePlayer === "white" &&
           !isPaused &&
@@ -453,7 +265,9 @@ function App() {
         return;
       }
 
-      if (event.key.toLowerCase() === "l") {
+      if (
+        event.key.toLowerCase() === "l"
+      ) {
         if (
           activePlayer === "black" &&
           !isPaused &&
@@ -472,15 +286,23 @@ function App() {
           activePlayer !== null &&
           winner === null
         ) {
-          setIsPaused((paused) => !paused);
+          setIsPaused(
+            (paused) => !paused
+          );
         }
       }
     }
 
-    window.addEventListener("keydown", handleKeyDown);
+    window.addEventListener(
+      "keydown",
+      handleKeyDown
+    );
 
     return () => {
-      window.removeEventListener("keydown", handleKeyDown);
+      window.removeEventListener(
+        "keydown",
+        handleKeyDown
+      );
     };
   }, [
     activePlayer,
@@ -488,37 +310,6 @@ function App() {
     winner,
   ]);
 
-  function switchTurn(player: Player) {
-    if (isPaused || activePlayer !== player) {
-      return;
-    }
-
-    if (player === "white") {
-      setWhiteTime((currentTime) => currentTime + increment);
-      setActivePlayer("black");
-    } else {
-      setBlackTime((currentTime) => currentTime + increment);
-      setActivePlayer("white");
-    }
-  }
-
-  function togglePause() {
-    if (activePlayer === null) {
-      return;
-    }
-
-    setIsPaused((paused) => !paused);
-  }
-
-  function resetGame() {
-    setActivePlayer(null);
-    setIsPaused(false);
-    setWinner(null);
-    setCrashPhase("idle");
-    setWhiteTime(initialTime);
-    setBlackTime(initialTime);
-    turnStartTime.current = null;
-  }
 
   const whitePressure = getPressureState(
     whiteTime,
@@ -531,6 +322,7 @@ function App() {
     activePlayer === "black" && !isPaused,
     winner === "white"
   );
+
 
   const whiteStatus = getPlayerStatus(
     whiteTime,
@@ -548,211 +340,97 @@ function App() {
     crashPhase
   );
 
+
+  const timeControlLabel =
+    `${Math.round(initialTime / 60)}+${increment}`;
+
+  const gameStatus = winner
+    ? "GAME OVER"
+    : isPaused
+      ? "PAUSED"
+      : activePlayer
+        ? "GAME IN PROGRESS"
+        : "READY";
+
+
   return (
     <main className="desktop">
-      <div 
-        className={`clock-window ${
-          isDragging ? "dragging" : ""
-        }`}
-        style={{
-          transform: `translate(
-            ${windowPosition.x}px,
-            ${windowPosition.y}px
-          )`,
-        }}
+      <WindowChrome
+        isDragging={isDragging}
+        windowPosition={windowPosition}
+        onPointerDown={startDragging}
+        onPointerMove={dragWindow}
+        onPointerUp={stopDragging}
+        onPointerCancel={stopDragging}
+        timeControlLabel={timeControlLabel}
+        status={gameStatus}
       >
-        <div 
-          className="title-bar"
-          onPointerDown={startDragging}
-          onPointerMove={dragWindow}
-          onPointerUp={stopDragging}
-          onPointerCancel={stopDragging}
-        >
-          <div className="title-bar-left">
-            <PixelIcon type="app" />
-            <span>chessclock.exe</span>
-          </div>
-
-          <div className="window-buttons">
-            <button type="button">_</button>
-            <button type="button">□</button>
-            <button type="button">×</button>
-          </div>
-        </div>
-
-        <div className="menu-bar">
-          <span>Game</span>
-          <span>Clock</span>
-          <span>Options</span>
-          <span>?</span>
-        </div>
-
-        <div className="program-banner">
-          <div>
-            <strong>CHESS CLOCK</strong>
-            <span> version 1.0</span>
-          </div>
-
-          <span className="program-message">
-            DON'T WASTE YOUR TIME
-          </span>
-        </div>
-
         <div className="window-content">
-          {activePlayer === null && (
-            <div className="setup-panel">
-              <h2>Time control</h2>
-
-              <div className="time-control-grid">
-                {timeControls.map((control) => (
-                  <button
-                    key={control.label}
-                    className="retro-button"
-                    onClick={() => selectTimeControl(control)}
-                  >
-                    {control.label}
-                  </button>
-                ))}
-              </div>
-
-              {isCustom && (
-                <div className="custom-controls">
-                  <label>
-                    Minutes
-                    <input
-                      type="number"
-                      min={1}
-                      value={customMinutes}
-                      onChange={(event) =>
-                        setCustomMinutes(Number(event.target.value))
-                      }
-                    />
-                  </label>
-
-                  <label>
-                    Increment
-                    <input
-                      type="number"
-                      min={0}
-                      value={customIncrement}
-                      onChange={(event) =>
-                        setCustomIncrement(Number(event.target.value))
-                      }
-                    />
-                  </label>
-
-                  <button
-                    className="retro-button"
-                    onClick={applyCustomTimeControl}
-                  >
-                    Apply
-                  </button>
-                </div>
-              )}
-            </div>
-          )}
+          {activePlayer === null &&
+            winner === null && (
+              <TimeControls
+                controls={timeControls}
+                isCustom={isCustom}
+                customMinutes={customMinutes}
+                customIncrement={customIncrement}
+                onSelectControl={selectTimeControl}
+                onCustomMinutesChange={setCustomMinutes}
+                onCustomIncrementChange={setCustomIncrement}
+                onApplyCustom={applyCustomTimeControl}
+              />
+            )}
 
           <span className="keyboard-status">
             KEYBOARD: A / L / SPACE
           </span>
 
-          {winner && crashPhase === "settled" && (
-            <div className="winner-message">
-              {winner === "white"
-                ? "WHITE_WINS_ON_TIME"
-                : "BLACK_WINS_ON_TIME"}
-            </div>
-          )}
+          {winner &&
+            crashPhase === "settled" && (
+              <div className="winner-message">
+                {winner === "white"
+                  ? "WHITE_WINS_ON_TIME"
+                  : "BLACK_WINS_ON_TIME"}
+              </div>
+            )}
 
           <div className="clock-grid">
-            <section
-              className={`player-panel ${whitePressure} ${
-                winner === "black" ? crashPhase : ""
-              } ${
-                activePlayer === "white" ? "active" : ""
-              }`}
-            >
-              <div className="player-label">
-                <span
-                  className={`status-light ${
-                    activePlayer === "white" ? "on" : ""
-                  }`}
-                />
+            <Clock
+              player="white"
+              time={whiteTime}
+              pressure={whitePressure}
+              status={whiteStatus}
+              isActive={activePlayer === "white"}
+              isPaused={isPaused}
+              winner={winner}
+              crashPhase={crashPhase}
+              onMove={() =>
+                switchTurn("white")
+              }
+            />
 
-                <PixelIcon type="white-king" />
-                <span>WHITE</span>
-              </div>
-
-              <div className="clock-display">
-                <span className="clock-value">
-                  {formatTime(whiteTime)}
-                </span>
-              </div>
-
-              <div className="player-status">
-                {whiteStatus}
-              </div>
-
-              <button
-                className="player-button"
-                onClick={() => switchTurn("white")}
-                disabled={
-                  activePlayer !== "white" ||
-                  isPaused ||
-                  winner !== null
-                }
-              >
-                [ A ] WHITE MOVED
-              </button>
-            </section>
-
-            <section
-              className={`player-panel ${blackPressure} ${
-                winner === "white" ? crashPhase : ""
-              } ${
-                activePlayer === "black" ? "active" : ""
-              }`}
-            >
-              <div className="player-label">
-                <span
-                  className={`status-light ${
-                    activePlayer === "black" ? "on" : ""
-                  }`}
-                />
-
-                <PixelIcon type="black-king" />
-                <span>BLACK</span>
-              </div>
-
-              <div className="clock-display">
-                <span className="clock-value">
-                  {formatTime(blackTime)}
-                </span>
-              </div>
-
-              <div className="player-status">
-                {blackStatus}
-              </div>
-
-              <button
-                className="player-button"
-                onClick={() => switchTurn("black")}
-                disabled={
-                  activePlayer !== "black" ||
-                  isPaused ||
-                  winner !== null
-                }
-              >
-                [ L ] BLACK MOVED
-              </button>
-            </section>
+            <Clock
+              player="black"
+              time={blackTime}
+              pressure={blackPressure}
+              status={blackStatus}
+              isActive={activePlayer === "black"}
+              isPaused={isPaused}
+              winner={winner}
+              crashPhase={crashPhase}
+              onMove={() =>
+                switchTurn("black")
+              }
+            />
           </div>
 
           <div className="control-row">
-            {activePlayer === null && winner === null ? (
+            {activePlayer === null &&
+            winner === null ? (
               <button
                 className="retro-button primary-button"
-                onClick={() => setActivePlayer("white")}
+                onClick={() =>
+                  setActivePlayer("white")
+                }
               >
                 START GAME
               </button>
@@ -762,7 +440,9 @@ function App() {
                 onClick={togglePause}
                 disabled={activePlayer === null}
               >
-                {isPaused ? "RESUME" : "PAUSE"}
+                {isPaused
+                  ? "RESUME"
+                  : "PAUSE"}
               </button>
             )}
 
@@ -774,24 +454,7 @@ function App() {
             </button>
           </div>
         </div>
-
-        <div className="status-bar">
-          <span>
-            TIME CONTROL: {Math.round(initialTime / 60)}+
-            {increment}
-          </span>
-
-          <span>
-            {winner
-              ? "GAME OVER"
-              : isPaused
-                ? "PAUSED"
-                : activePlayer
-                  ? "GAME IN PROGRESS"
-                  : "READY"}
-          </span>
-        </div>
-      </div>
+      </WindowChrome>
     </main>
   );
 }
