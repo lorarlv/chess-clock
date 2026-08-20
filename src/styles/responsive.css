@@ -1,0 +1,35 @@
+@media (max-width: 650px) {
+  .desktop {
+    padding: 20px 10px;
+    align-items: flex-start;
+  }
+
+  .window-content {
+    padding: 14px;
+  }
+
+  .clock-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .player-panel {
+    padding: 18px;
+  }
+
+  .clock-display {
+    font-size: clamp(3rem, 17vw, 5rem);
+  }
+
+  .status-bar {
+    flex-direction: column;
+    gap: 3px;
+  }
+
+  .keyboard-status {
+    display: none;
+  }
+
+  .program-message {
+    display: none;
+  }
+}

@@ -1,0 +1,658 @@
+.player-panel.low .clock-value {
+  display: inline-block;
+  animation:
+    low-time-flicker 3.7s steps(1, end) infinite,
+    low-time-jitter 5.3s steps(1, end) infinite;
+}
+
+@keyframes low-time-flicker {
+  0%,
+  17% {
+    filter: none;
+  }
+
+  18% {
+    filter: brightness(0.68);
+  }
+
+  19% {
+    filter: brightness(1.16);
+  }
+
+  20% {
+    filter: none;
+  }
+
+  21% {
+    filter: brightness(0.88);
+  }
+
+  22%,
+  61% {
+    filter: none;
+  }
+
+  62% {
+    filter: brightness(1.12);
+  }
+
+  63% {
+    filter: brightness(0.76);
+  }
+
+  64%,
+  66% {
+    filter: none;
+  }
+
+  67% {
+    filter: brightness(0.91);
+  }
+
+  68%,
+  100% {
+    filter: none;
+  }
+}
+
+@keyframes low-time-jitter {
+  0%,
+  43% {
+    transform: translate(0, 0);
+  }
+
+  44% {
+    transform: translate(1px, 0);
+  }
+
+  45% {
+    transform: translate(-1px, 0);
+  }
+
+  46%,
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+.player-panel.critical .clock-value {
+  display: inline-block;
+  animation:
+    critical-flicker 1.9s steps(1, end) infinite,
+    critical-jitter 1.3s steps(1, end) infinite;
+}
+
+.player-panel.critical .player-status {
+  animation: critical-status 2.6s steps(1, end) infinite;
+}
+
+@keyframes critical-flicker {
+  0%,
+  12%,
+  15%,
+  42%,
+  45%,
+  71%,
+  74%,
+  100% {
+    opacity: 1;
+    filter: none;
+  }
+
+  13% {
+    opacity: 0.55;
+  }
+
+  14% {
+    filter: brightness(1.35);
+  }
+
+  43% {
+    opacity: 0.7;
+  }
+
+  44% {
+    filter: brightness(0.65);
+  }
+
+  72% {
+    filter: brightness(1.2);
+  }
+
+  73% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes critical-jitter {
+  0%,
+  28%,
+  31%,
+  63%,
+  66%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  29% {
+    transform: translate(2px, 0);
+  }
+
+  30% {
+    transform: translate(-1px, 1px);
+  }
+
+  64% {
+    transform: translate(-2px, 0);
+  }
+
+  65% {
+    transform: translate(1px, -1px);
+  }
+}
+
+@keyframes critical-status {
+  0%,
+  78%,
+  82%,
+  100% {
+    transform: none;
+  }
+
+  79% {
+    transform: translateX(1px);
+  }
+
+  80% {
+    transform: translateX(-2px);
+  }
+
+  81% {
+    transform: none;
+  }
+}
+
+.player-panel.terminal {
+  animation:
+    terminal-panel-jitter 0.42s steps(1, end) infinite,
+    terminal-panel-flicker 0.9s steps(1, end) infinite;
+}
+
+.player-panel.terminal .clock-value {
+  display: inline-block;
+  animation:
+    terminal-clock-jitter 0.18s steps(1, end) infinite,
+    terminal-clock-flicker 0.36s steps(1, end) infinite;
+  text-shadow:
+    -2px 0 #ff3b8d,
+    2px 0 #39d9ff,
+    0 0 4px rgba(255, 255, 255, 0.25);
+}
+
+.player-panel.terminal .player-status {
+  animation:
+    terminal-status 0.55s steps(1, end) infinite;
+  text-shadow:
+    -1px 0 #ff3b8d,
+    1px 0 #39d9ff;
+}
+
+@keyframes terminal-panel-jitter {
+  0%,
+  18%,
+  22%,
+  41%,
+  45%,
+  67%,
+  71%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  19% {
+    transform: translate(2px, -1px);
+  }
+
+  20% {
+    transform: translate(-3px, 1px);
+  }
+
+  21% {
+    transform: translate(1px, 0);
+  }
+
+  42% {
+    transform: translate(-2px, 0);
+  }
+
+  43% {
+    transform: translate(3px, 1px);
+  }
+
+  44% {
+    transform: translate(-1px, -1px);
+  }
+
+  68% {
+    transform: translate(2px, 1px);
+  }
+
+  69% {
+    transform: translate(-2px, -1px);
+  }
+
+  70% {
+    transform: translate(1px, 0);
+  }
+}
+
+@keyframes terminal-panel-flicker {
+  0%,
+  11%,
+  15%,
+  36%,
+  40%,
+  62%,
+  65%,
+  82%,
+  86%,
+  100% {
+    filter: none;
+  }
+
+  12% {
+    filter:
+      contrast(1.3)
+      saturate(1.5);
+  }
+
+  13% {
+    filter:
+      brightness(0.72)
+      hue-rotate(12deg);
+  }
+
+  14% {
+    filter:
+      brightness(1.18)
+      saturate(1.8);
+  }
+
+  37% {
+    filter:
+      contrast(1.5)
+      hue-rotate(-18deg);
+  }
+
+  38% {
+    filter:
+      brightness(0.58);
+  }
+
+  39% {
+    filter:
+      brightness(1.28)
+      saturate(1.6);
+  }
+
+  63% {
+    filter:
+      hue-rotate(22deg)
+      contrast(1.4);
+  }
+
+  64% {
+    filter:
+      brightness(0.65);
+  }
+
+  83% {
+    filter:
+      saturate(2)
+      contrast(1.35);
+  }
+
+  84% {
+    filter:
+      brightness(0.7)
+      hue-rotate(-14deg);
+  }
+
+  85% {
+    filter:
+      brightness(1.2);
+  }
+}
+
+@keyframes terminal-clock-jitter {
+  0%,
+  24%,
+  27%,
+  52%,
+  56%,
+  79%,
+  83%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  25% {
+    transform: translate(3px, 0);
+  }
+
+  26% {
+    transform: translate(-2px, 1px);
+  }
+
+  53% {
+    transform: translate(-4px, 0);
+  }
+
+  54% {
+    transform: translate(2px, -1px);
+  }
+
+  55% {
+    transform: translate(1px, 1px);
+  }
+
+  80% {
+    transform: translate(3px, -1px);
+  }
+
+  81% {
+    transform: translate(-3px, 1px);
+  }
+
+  82% {
+    transform: translate(1px, 0);
+  }
+}
+
+@keyframes terminal-clock-flicker {
+  0%,
+  14%,
+  18%,
+  39%,
+  43%,
+  68%,
+  72%,
+  100% {
+    opacity: 1;
+  }
+
+  15% {
+    opacity: 0.35;
+  }
+
+  16% {
+    opacity: 0.9;
+  }
+
+  17% {
+    opacity: 0.5;
+  }
+
+  40% {
+    opacity: 0.2;
+  }
+
+  41% {
+    opacity: 1;
+  }
+
+  42% {
+    opacity: 0.55;
+  }
+
+  69% {
+    opacity: 0.4;
+  }
+
+  70% {
+    opacity: 1;
+  }
+
+  71% {
+    opacity: 0.65;
+  }
+}
+
+@keyframes terminal-status {
+  0%,
+  30%,
+  34%,
+  61%,
+  65%,
+  100% {
+    transform: translate(0, 0);
+  }
+
+  31% {
+    transform: translateX(3px);
+  }
+
+  32% {
+    transform: translateX(-2px);
+  }
+
+  33% {
+    transform: translateX(1px);
+  }
+
+  62% {
+    transform: translateX(-3px);
+  }
+
+  63% {
+    transform: translateX(2px);
+  }
+
+  64% {
+    transform: translateX(0);
+  }
+}
+
+.player-panel.crashed {
+  filter:
+    contrast(1.45)
+    saturate(0.55)
+    hue-rotate(-12deg);
+
+  transform: translate(1px, 0);
+
+  background: #9d978d;
+}
+
+.player-panel.crashed .clock-value {
+  color: #e9e2b7;
+
+  text-shadow:
+    -3px 0 #d83a62,
+    3px 0 #3ca7b8;
+
+  animation:
+    crash-flicker 0.12s steps(1, end) 8;
+}
+
+.player-panel.crashed .clock-display {
+  background: #11130f;
+}
+
+.player-panel.crashed .player-status {
+  color: #5b1515;
+  font-weight: 900;
+}
+
+.player-panel.crashed.burst {
+  animation:
+    crash-panel-burst 2.8s steps(1, end) 1;
+}
+
+.player-panel.crashed.burst .clock-value {
+  animation:
+    crash-clock-burst 0.24s steps(1, end) 11;
+  text-shadow:
+    -4px 0 #d83a62,
+    4px 0 #3ca7b8;
+}
+
+.player-panel.crashed.burst .player-status {
+  animation:
+    crash-status-burst 0.35s steps(1, end) 8;
+  text-shadow:
+    -2px 0 #d83a62,
+    2px 0 #3ca7b8;
+}
+
+@keyframes crash-panel-burst {
+  0% {
+    transform: translate(0, 0);
+    filter: none;
+  }
+
+  8% {
+    transform: translate(-6px, 2px);
+    filter: contrast(1.9) saturate(2);
+  }
+
+  14% {
+    transform: translate(5px, -2px);
+    filter: brightness(0.4);
+  }
+
+  21% {
+    transform: translate(-4px, 1px);
+    filter: hue-rotate(24deg) contrast(1.7);
+  }
+
+  29% {
+    transform: translate(6px, 0);
+    filter: brightness(1.45) saturate(1.8);
+  }
+
+  37% {
+    transform: translate(-3px, -1px);
+    filter: saturate(0.6);
+  }
+
+  46% {
+    transform: translate(4px, 1px);
+    filter: hue-rotate(-18deg) contrast(1.5);
+  }
+
+  55% {
+    transform: translate(-2px, 0);
+    filter: contrast(1.35);
+  }
+
+  64% {
+    transform: translate(2px, -1px);
+    filter: saturate(0.7);
+  }
+
+  73% {
+    transform: translate(-1px, 0);
+    filter:
+      contrast(1.5)
+      saturate(0.55)
+      hue-rotate(-10deg);
+  }
+
+  82% {
+    transform: translate(1px, 0);
+    filter:
+      contrast(1.42)
+      saturate(0.5)
+      hue-rotate(-12deg);
+  }
+
+  100% {
+    transform: translate(1px, 0);
+    filter:
+      contrast(1.45)
+      saturate(0.55)
+      hue-rotate(-12deg);
+  }
+}
+
+@keyframes crash-clock-burst {
+  0% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+
+  25% {
+    transform: translate(-6px, 1px);
+    opacity: 0.25;
+  }
+
+  50% {
+    transform: translate(5px, -1px);
+    opacity: 1;
+  }
+
+  75% {
+    transform: translate(-3px, 0);
+    opacity: 0.4;
+  }
+
+  100% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+}
+
+@keyframes crash-status-burst {
+  0% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+
+  33% {
+    transform: translateX(4px);
+    opacity: 0.4;
+  }
+
+  66% {
+    transform: translateX(-4px);
+    opacity: 1;
+  }
+
+  100% {
+    transform: translateX(0);
+    opacity: 1;
+  }
+}
+
+@keyframes crash-flicker {
+  0% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+
+  20% {
+    transform: translate(-5px, 1px);
+    opacity: 0.3;
+  }
+
+  40% {
+    transform: translate(4px, -1px);
+    opacity: 1;
+  }
+
+  60% {
+    transform: translate(-2px, 0);
+    opacity: 0.45;
+  }
+
+  80% {
+    transform: translate(3px, 1px);
+    opacity: 0.8;
+  }
+
+  100% {
+    transform: translate(0, 0);
+    opacity: 1;
+  }
+}

@@ -1,0 +1,15 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: "Courier New", monospace;
+  background: #1d2630;
+  color: #111;
+}
+
+button,
+input {
+  font: inherit;
+}
