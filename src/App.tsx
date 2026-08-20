@@ -31,6 +31,8 @@ type PressureState =
   | "terminal"
   | "crashed";
 
+type CrashPhase = "idle" | "burst" | "settled";
+
 function getPressureState(
   time: number,
   isActive: boolean,
@@ -207,9 +209,13 @@ function getPlayerStatus(
   time: number,
   isActive: boolean,
   isPaused: boolean,
-  hasTimedOut: boolean
+  hasTimedOut: boolean,
+  crashPhase: CrashPhase
 ): string {
   if (hasTimedOut) {
+    if (crashPhase === "burst") {
+      return "TIME EXPIRED";
+    }
     return "CLOCK FAILURE";
   }
 
@@ -252,6 +258,8 @@ function App() {
   const turnStartTime = useRef<number | null>(null);
 
   const [isPaused, setIsPaused] = useState(false);
+
+  const [crashPhase, setCrashPhase] = useState<CrashPhase>("idle");
 
   function selectTimeControl(control: TimeControl) {
     if (activePlayer !== null) {
@@ -314,8 +322,13 @@ function App() {
           const nextTime = Math.max(currentTime - elapsed, 0);
 
           if (nextTime === 0) {
+            setCrashPhase("burst");
             setWinner("black");
             setActivePlayer(null);
+
+            setTimeout(() => {
+              setCrashPhase("settled");
+            }, 2800);
           }
 
           return nextTime;
@@ -325,8 +338,13 @@ function App() {
           const nextTime = Math.max(currentTime - elapsed, 0);
 
           if (nextTime === 0) {
+            setCrashPhase("burst");
             setWinner("white");
             setActivePlayer(null);
+
+            setTimeout(() => {
+              setCrashPhase("settled");
+            }, 2800);
           }
 
           return nextTime;
@@ -429,6 +447,7 @@ function App() {
     setActivePlayer(null);
     setIsPaused(false);
     setWinner(null);
+    setCrashPhase("idle");
     setWhiteTime(initialTime);
     setBlackTime(initialTime);
     turnStartTime.current = null;
@@ -450,14 +469,16 @@ function App() {
     whiteTime,
     activePlayer === "white",
     isPaused,
-    winner === "black"
+    winner === "black",
+    crashPhase
   );
 
   const blackStatus = getPlayerStatus(
     blackTime,
     activePlayer === "black",
     isPaused,
-    winner === "white"
+    winner === "white",
+    crashPhase
   );
 
   return (
@@ -552,7 +573,7 @@ function App() {
             KEYBOARD: A / L / SPACE
           </span>
 
-          {winner && (
+          {winner && crashPhase === "settled" && (
             <div className="winner-message">
               {winner === "white"
                 ? "WHITE_WINS_ON_TIME"
@@ -563,6 +584,8 @@ function App() {
           <div className="clock-grid">
             <section
               className={`player-panel ${whitePressure} ${
+                winner === "black" ? crashPhase : ""
+              } ${
                 activePlayer === "white" ? "active" : ""
               }`}
             >
@@ -602,6 +625,8 @@ function App() {
 
             <section
               className={`player-panel ${blackPressure} ${
+                winner === "white" ? crashPhase : ""
+              } ${
                 activePlayer === "black" ? "active" : ""
               }`}
             >
