@@ -1,5 +1,8 @@
 import "./App.css";
 
+import { getCurrentWindow } from "@tauri-apps/api/window";
+import { LogicalSize } from "@tauri-apps/api/dpi";
+
 import { useEffect, useRef, useState } from "react";
 
 import Clock from "./components/clock";
@@ -7,8 +10,6 @@ import TimeControls from "./components/timeControls";
 import WindowChrome from "./components/windowChrome";
 
 import type { TimeControl } from "./components/timeControls";
-
-import { useDraggableWindow } from "./hooks/useDraggableWindow";
 
 import {
   getPlayerStatus,
@@ -36,6 +37,8 @@ const timeControls: TimeControl[] = [
 
 
 function App() {
+  const appWindow = getCurrentWindow();
+
   const [initialTime, setInitialTime] = useState(5 * 60);
   const [increment, setIncrement] = useState(0);
 
@@ -56,15 +59,40 @@ function App() {
 
   const turnStartTime = useRef<number | null>(null);
 
-  const {
-    windowRef,
-    windowPosition,
-    isDragging,
-    startDragging,
-    dragWindow,
-    stopDragging,
-  } = useDraggableWindow();
+  useEffect(() => {
+    const resizeWindow = async () => {
+      const isMaximized =
+        await appWindow.isMaximized();
 
+      if (isMaximized) {
+        return;
+      }
+
+      const root = document.querySelector(
+        ".clock-window"
+      ) as HTMLElement | null;
+
+      if (!root) {
+        return;
+      }
+
+      const width = root.offsetWidth;
+      const height = root.scrollHeight;
+
+      await appWindow.setSize(
+        new LogicalSize(width, height)
+      );
+    };
+
+    requestAnimationFrame(() => {
+      requestAnimationFrame(resizeWindow);
+    });
+  }, [
+    activePlayer,
+    winner,
+    crashPhase,
+    isCustom,
+  ]);
 
   function selectTimeControl(control: TimeControl) {
     if (activePlayer !== null) {
@@ -357,13 +385,6 @@ function App() {
   return (
     <main className="desktop">
       <WindowChrome
-        windowRef={windowRef}
-        isDragging={isDragging}
-        windowPosition={windowPosition}
-        onPointerDown={startDragging}
-        onPointerMove={dragWindow}
-        onPointerUp={stopDragging}
-        onPointerCancel={stopDragging}
         timeControlLabel={timeControlLabel}
         status={gameStatus}
       >

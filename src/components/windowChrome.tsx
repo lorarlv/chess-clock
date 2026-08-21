@@ -1,25 +1,29 @@
-import type { PointerEvent as ReactPointerEvent, ReactNode, RefObject } from "react";
+import { getCurrentWindow } from "@tauri-apps/api/window";
+
+import type { ReactNode } from "react";
 
 import PixelIcon from "./pixel";
 
+const appWindow = getCurrentWindow();
+
+async function minimizeWindow() {
+  await appWindow.minimize();
+}
+
+async function toggleMaximizeWindow() {
+  await appWindow.toggleMaximize();
+}
+
+async function closeWindow() {
+  await appWindow.close();
+}
+
+async function startNativeDrag() {
+  await appWindow.startDragging();
+}
+
 type WindowChromeProps = {
   children: ReactNode;
-
-  windowRef: RefObject<HTMLDivElement | null>;
-
-  isDragging: boolean;
-  windowPosition: {
-    x: number;
-    y: number;
-  };
-
-  onPointerDown: (event: ReactPointerEvent<HTMLDivElement>) => void;
-
-  onPointerMove: (event: ReactPointerEvent<HTMLDivElement>) => void;
-
-  onPointerUp: (event: ReactPointerEvent<HTMLDivElement>) => void;
-
-  onPointerCancel: (event: ReactPointerEvent<HTMLDivElement>) => void;
 
   timeControlLabel: string;
   status: string;
@@ -27,35 +31,24 @@ type WindowChromeProps = {
 
 function WindowChrome({
   children,
-  windowRef,
-  isDragging,
-  windowPosition,
-  onPointerDown,
-  onPointerMove,
-  onPointerUp,
-  onPointerCancel,
   timeControlLabel,
   status,
 }: WindowChromeProps) {
   return (
-    <div
-      ref={windowRef}
-      className={`clock-window ${
-        isDragging ? "dragging" : ""
-      }`}
-      style={{
-        transform: `translate(
-          ${windowPosition.x}px,
-          ${windowPosition.y}px
-        )`,
-      }}
-    >
+    <div className="clock-window">
       <div
         className="title-bar"
-        onPointerDown={onPointerDown}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        onPointerCancel={onPointerCancel}
+        onMouseDown={(event) => {
+          if (event.button !== 0) {
+            return;
+          }
+
+          if ((event.target as HTMLElement).closest(".window-buttons")) {
+            return;
+          }
+
+          startNativeDrag();
+        }}
       >
         <div className="title-bar-left">
           <PixelIcon type="app" />
@@ -63,9 +56,26 @@ function WindowChrome({
         </div>
 
         <div className="window-buttons">
-          <button type="button">_</button>
-          <button type="button">□</button>
-          <button type="button">×</button>
+          <button
+            type="button"
+            onClick={minimizeWindow}
+          >
+            _
+          </button>
+
+          <button
+            type="button"
+            onClick={toggleMaximizeWindow}
+          >
+            □
+          </button>
+
+          <button
+            type="button"
+            onClick={closeWindow}
+          >
+            ×
+          </button>
         </div>
       </div>
 

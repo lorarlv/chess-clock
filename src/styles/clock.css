@@ -83,6 +83,8 @@
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 18px;
+  flex: 1;
+  min-height: 0;
 }
 
 .player-panel {
@@ -95,6 +97,8 @@
 
   background: #aaa;
   text-align: center;
+  display: flex;
+  flex-direction: column;
 }
 
 .player-panel.active {
@@ -134,6 +138,11 @@
 
 .clock-display {
   position: relative;
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 130px;
   padding: 18px 12px;
 
   border-top: 4px solid #55584f;
