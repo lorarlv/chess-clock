@@ -91,7 +91,7 @@ function WindowChrome({
   }, []);
 
   useEffect(() => {
-    if (openDialog !== "about") {
+    if (openDialog !== "about" || !visualEffects) {
       setAboutGlitch(null);
       return;
     }
@@ -137,7 +137,7 @@ function WindowChrome({
       clearTimeout(glitchTimeout);
       clearTimeout(resetTimeout);
     };
-  }, [openDialog]);
+  }, [openDialog, visualEffects]);
 
   return (
     <div className="clock-window">

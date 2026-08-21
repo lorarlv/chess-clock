@@ -224,11 +224,18 @@ function App() {
             );
 
           if (nextTime === 0) {
-            setCrashPhase("burst");
             setWinner("black");
             setActivePlayer(null);
 
-            setTimeout(() => {setCrashPhase("settled")}, 2800);
+            if (visualEffects) {
+              setCrashPhase("burst");
+          
+              setTimeout(() => {
+                setCrashPhase("settled");
+              }, 2800);
+            } else {
+              setCrashPhase("settled");
+            }
           }
 
           return nextTime;
@@ -242,11 +249,18 @@ function App() {
             );
 
           if (nextTime === 0) {
-            setCrashPhase("burst");
             setWinner("white");
             setActivePlayer(null);
 
-            setTimeout(() => {setCrashPhase("settled")}, 2800);
+            if (visualEffects) {
+              setCrashPhase("burst");
+
+              setTimeout(() => {
+                setCrashPhase("settled");
+              }, 2800);
+            } else {
+              setCrashPhase("settled");
+            }
           }
 
           return nextTime;
@@ -262,6 +276,7 @@ function App() {
     activePlayer,
     isPaused,
     winner,
+    visualEffects,
   ]);
 
 
@@ -376,7 +391,8 @@ function App() {
     activePlayer === "white",
     isPaused,
     winner === "black",
-    crashPhase
+    crashPhase,
+    visualEffects
   );
 
   const blackStatus = getPlayerStatus(
@@ -384,7 +400,8 @@ function App() {
     activePlayer === "black",
     isPaused,
     winner === "white",
-    crashPhase
+    crashPhase,
+    visualEffects
   );
 
 
@@ -460,6 +477,7 @@ function App() {
               isPaused={isPaused}
               winner={winner}
               crashPhase={crashPhase}
+              visualEffects={visualEffects}
               onMove={() =>
                 switchTurn("white")
               }
@@ -474,6 +492,7 @@ function App() {
               isPaused={isPaused}
               winner={winner}
               crashPhase={crashPhase}
+              visualEffects={visualEffects}
               onMove={() =>
                 switchTurn("black")
               }

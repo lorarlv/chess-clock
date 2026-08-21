@@ -18,6 +18,8 @@ type ClockProps = {
   winner: Player | null;
   crashPhase: CrashPhase;
 
+  visualEffects: boolean;
+
   onMove: () => void;
 };
 
@@ -30,6 +32,7 @@ function Clock({
   isPaused,
   winner,
   crashPhase,
+  visualEffects,
   onMove,
 }: ClockProps) {
   const isWhite = player === "white";
@@ -56,8 +59,12 @@ function Clock({
 
   return (
     <section
-      className={`player-panel ${pressure} ${
-        hasLostOnTime ? crashPhase : ""
+      className={`player-panel ${
+        visualEffects ? pressure : "normal"
+      } ${
+        visualEffects && hasLostOnTime
+          ? crashPhase
+          : ""
       } ${
         isActive ? "active" : ""
       }`}

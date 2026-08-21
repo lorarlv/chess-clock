@@ -176,9 +176,14 @@ export function getPlayerStatus(
   isActive: boolean,
   isPaused: boolean,
   hasTimedOut: boolean,
-  crashPhase: CrashPhase
+  crashPhase: CrashPhase,
+  visualEffects: boolean
 ): string {
   if (hasTimedOut) {
+    if (!visualEffects) {
+      return "TIME EXPIRED";
+    }
+
     if (crashPhase === "burst") {
       return "TIME EXPIRED";
     }
@@ -194,6 +199,18 @@ export function getPlayerStatus(
     return "PAUSED";
   }
 
+  if (!visualEffects) {
+    if (time <= 7) {
+      return "TIME CRITICAL";
+    }
+
+    if (time <=30) {
+      return "TIME IS RUNNING OUT";
+    }
+
+    return "YOUR MOVE";
+  }
+  
   if (time <= 7) {
     return corruptStatusText(
       CRITICAL_TIME_TEXT,
