@@ -16,8 +16,10 @@ A desktop chess clock built with React, TypeScript, and Tauri.
 - responsive window sizing
 
 ## Controls
+- `Enter` - start game
 - `A` - white finishes their move
 - `L` - black finishes their move
+- `R` - reset game
 - `Space` - pause/resume
 
 ## Time controls

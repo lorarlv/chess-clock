@@ -280,6 +280,22 @@ function App() {
         return;
       }
 
+      if (event.key === "Enter") {
+        if (
+          activePlayer === null &&
+          winner === null
+        ) {
+          setActivePlayer("white");
+        }
+
+        return;
+      }
+
+      if (event.key.toLowerCase() === "r") {
+        resetGame();
+        return;
+      }
+
       if (
         event.key.toLowerCase() === "a"
       ) {
@@ -404,7 +420,7 @@ function App() {
             )}
 
           <span className="keyboard-status">
-            KEYBOARD: A / L / SPACE
+            KEYBOARD: A / L / SPACE / ENTER / R
           </span>
 
           {winner &&
