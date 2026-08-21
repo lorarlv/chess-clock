@@ -1,9 +1,11 @@
-import type { PointerEvent as ReactPointerEvent, ReactNode } from "react";
+import type { PointerEvent as ReactPointerEvent, ReactNode, RefObject } from "react";
 
 import PixelIcon from "./pixel";
 
 type WindowChromeProps = {
   children: ReactNode;
+
+  windowRef: RefObject<HTMLDivElement | null>;
 
   isDragging: boolean;
   windowPosition: {
@@ -25,6 +27,7 @@ type WindowChromeProps = {
 
 function WindowChrome({
   children,
+  windowRef,
   isDragging,
   windowPosition,
   onPointerDown,
@@ -36,6 +39,7 @@ function WindowChrome({
 }: WindowChromeProps) {
   return (
     <div
+      ref={windowRef}
       className={`clock-window ${
         isDragging ? "dragging" : ""
       }`}

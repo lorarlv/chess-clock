@@ -17,6 +17,8 @@ export function useDraggableWindow() {
     windowY: 0,
   });
 
+  const windowRef = useRef<HTMLDivElement | null>(null);
+
   function startDragging(event: ReactPointerEvent<HTMLDivElement>) {
     if (
       (event.target as HTMLElement).closest(".window-buttons")
@@ -37,21 +39,34 @@ export function useDraggableWindow() {
   }
 
   function dragWindow(event: ReactPointerEvent<HTMLDivElement>) {
-    if (!isDragging) {
+    if (!isDragging || !windowRef.current) {
       return;
     }
 
-    const deltaX =
-      event.clientX -
-      dragStart.current.pointerX;
+    const deltaX = event.clientX - dragStart.current.pointerX;
 
-    const deltaY =
-      event.clientY -
-      dragStart.current.pointerY;
+    const deltaY = event.clientY - dragStart.current.pointerY;
+
+    const nextX = dragStart.current.windowX + deltaX;
+
+    const nextY = dragStart.current.windowY + deltaY;
+
+    const rect = windowRef.current.getBoundingClientRect();
+
+    const visibleX = 100;
+    const titleBarHeight = 30;
+
+    const maxX = window.innerWidth - visibleX;
+
+    const minX = -(rect.width - visibleX);
+
+    const maxY = window.innerHeight - titleBarHeight;
+
+    const minY = 0;
 
     setWindowPosition({
-      x: dragStart.current.windowX + deltaX,
-      y: dragStart.current.windowY + deltaY,
+      x: Math.min(Math.max(nextX, minX), maxX),
+      y: Math.min(Math.max(nextY, minY), maxY),
     });
   }
 
@@ -74,6 +89,7 @@ export function useDraggableWindow() {
   }
 
   return {
+    windowRef,
     windowPosition,
     isDragging,
     startDragging,

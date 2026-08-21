@@ -57,6 +57,7 @@ function App() {
   const turnStartTime = useRef<number | null>(null);
 
   const {
+    windowRef,
     windowPosition,
     isDragging,
     startDragging,
@@ -356,6 +357,7 @@ function App() {
   return (
     <main className="desktop">
       <WindowChrome
+        windowRef={windowRef}
         isDragging={isDragging}
         windowPosition={windowPosition}
         onPointerDown={startDragging}
