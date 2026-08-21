@@ -59,6 +59,8 @@ function App() {
 
   const turnStartTime = useRef<number | null>(null);
 
+  const [visualEffects, setVisualEffects] = useState(true);
+
   useEffect(() => {
     const resizeWindow = async () => {
       const isMaximized =
@@ -403,6 +405,22 @@ function App() {
       <WindowChrome
         timeControlLabel={timeControlLabel}
         status={gameStatus}
+        canStart={
+          activePlayer === null &&
+          winner === null
+        }
+        canPause={
+          activePlayer !== null &&
+          winner === null
+        }
+        isPaused={isPaused}
+        onStart={() => setActivePlayer("white")}
+        onReset={resetGame}
+        onTogglePause={togglePause}
+        visualEffects={visualEffects}
+        onToggleVisualEffects={() =>
+          setVisualEffects((enabled) => !enabled)
+        }
       >
         <div className="window-content">
           {activePlayer === null &&
