@@ -438,6 +438,10 @@ function App() {
         onToggleVisualEffects={() =>
           setVisualEffects((enabled) => !enabled)
         }
+        gameInProgress={
+          activePlayer !== null &&
+          winner === null
+        }
       >
         <div className="window-content">
           {activePlayer === null &&

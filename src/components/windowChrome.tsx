@@ -15,10 +15,6 @@ async function toggleMaximizeWindow() {
   await appWindow.toggleMaximize();
 }
 
-async function closeWindow() {
-  await appWindow.close();
-}
-
 async function startNativeDrag() {
   await appWindow.startDragging();
 }
@@ -35,6 +31,7 @@ type WindowChromeProps = {
   onTogglePause: () => void;
   visualEffects: boolean;
   onToggleVisualEffects: () => void;
+  gameInProgress: boolean;
 };
 
 function WindowChrome({
@@ -49,7 +46,12 @@ function WindowChrome({
   onTogglePause,
   visualEffects,
   onToggleVisualEffects,
+  gameInProgress,
 }: WindowChromeProps) {
+
+  const [alwaysOnTop, setAlwaysOnTop] = useState(false);
+
+  const [showCloseConfirm, setShowCloseConfirm] = useState(false);
   
   const [openMenu, setOpenMenu] = useState<
     "game" | "clock" | "options" | "help" | null
@@ -64,6 +66,49 @@ function WindowChrome({
   >(null);
 
   const menuBarRef = useRef<HTMLDivElement>(null);
+
+  async function requestClose() {
+    if (gameInProgress) {
+      setShowCloseConfirm(true);
+      return;
+    }
+
+    await appWindow.destroy();
+  }
+
+  async function confirmClose() {
+    setShowCloseConfirm(false);
+    await appWindow.destroy();
+  }
+
+  useEffect(() => {
+    appWindow.isAlwaysOnTop().then(setAlwaysOnTop);
+  }, []);
+
+  async function toggleAlwaysOnTop() {
+    const nextValue = !alwaysOnTop;
+
+    await appWindow.setAlwaysOnTop(nextValue);
+    setAlwaysOnTop(nextValue);
+  }
+
+  useEffect(() => {
+    let unlisten: (() => void) | undefined;
+
+    appWindow.onCloseRequested((event) => {
+      if (gameInProgress) {
+        event.preventDefault();
+        setShowCloseConfirm(true);
+      }
+    })
+      .then((cleanup) => {
+        unlisten = cleanup;
+      });
+
+    return () => {
+      unlisten?.();
+    };
+  }, [gameInProgress]);
 
   useEffect(() => {
     function handleMouseDown(event: MouseEvent) {
@@ -177,7 +222,7 @@ function WindowChrome({
 
           <button
             type="button"
-            onClick={closeWindow}
+            onClick={requestClose}
           >
             ×
           </button>
@@ -230,7 +275,7 @@ function WindowChrome({
 
               <button
                 type="button"
-                onClick={closeWindow}
+                onClick={requestClose}
               >
                 Exit
               </button>
@@ -286,6 +331,18 @@ function WindowChrome({
 
           {openMenu === "options" && (
             <div className="menu-dropdown options-dropdown">
+              <button
+                type="button"
+                className="menu-check-item"
+                onClick={toggleAlwaysOnTop}
+              >
+                <span className="menu-check">
+                  {alwaysOnTop ? "✓" : ""}
+                </span>
+
+                <span>Always on top</span>
+              </button>
+
               <button
                 type="button"
                 className="menu-check-item"
@@ -437,7 +494,6 @@ function WindowChrome({
                   </p>
                 </>
               )}
-
               <button
                 type="button"
                 className="retro-button dialog-ok"
@@ -445,6 +501,48 @@ function WindowChrome({
               >
                 OK
               </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {showCloseConfirm && (
+        <div className="dialog-overlay">
+          <div className="retro-dialog close-dialog">
+            <div className="dialog-title-bar">
+              <span>chessclock.exe</span>
+            </div>
+
+            <div className="dialog-content">
+              <p>
+                <strong>GAME STILL IN PROGRESS</strong>
+              </p>
+
+              <p>Timing process has not completed.</p>
+
+              <p className="close-warning">
+                TERMINATE ANYWAY?
+              </p>
+
+              <div className="dialog-actions">
+                <button
+                  type="button"
+                  className="retro-button"
+                  onClick={() =>
+                    setShowCloseConfirm(false)
+                  }
+                >
+                  CANCEL
+                </button>
+
+                <button
+                  type="button"
+                  className="retro-button"
+                  onClick={confirmClose}
+                >
+                  TERMINATE
+                </button>
+              </div>
             </div>
           </div>
         </div>
