@@ -1,3 +1,5 @@
+import type { Theme } from "../types/theme";
+
 import { getCurrentWindow } from "@tauri-apps/api/window";
 
 import { useEffect, useRef, useState } from "react";
@@ -32,6 +34,8 @@ type WindowChromeProps = {
   visualEffects: boolean;
   onToggleVisualEffects: () => void;
   gameInProgress: boolean;
+  theme: Theme;
+  onThemeChange: (theme: Theme) => void;
 };
 
 function WindowChrome({
@@ -47,7 +51,11 @@ function WindowChrome({
   visualEffects,
   onToggleVisualEffects,
   gameInProgress,
+  theme,
+  onThemeChange,
 }: WindowChromeProps) {
+
+  const [themeMenuOpen, setThemeMenuOpen] = useState(false);
 
   const [alwaysOnTop, setAlwaysOnTop] = useState(false);
 
@@ -346,9 +354,7 @@ function WindowChrome({
               <button
                 type="button"
                 className="menu-check-item"
-                onClick={() => {
-                  onToggleVisualEffects();
-                }}
+                onClick={onToggleVisualEffects}
               >
                 <span className="menu-check">
                   {visualEffects ? "✓" : ""}
@@ -356,6 +362,80 @@ function WindowChrome({
 
                 <span>Visual Effects</span>
               </button>
+
+              <div className="menu-separator" />
+
+              <div
+                className="submenu-item"
+                onMouseEnter={() =>
+                  setThemeMenuOpen(true)
+                }
+                onMouseLeave={() =>
+                  setThemeMenuOpen(false)
+                }
+              >
+                <button
+                  type="button"
+                  className="submenu-trigger"
+                  onClick={() =>
+                    setThemeMenuOpen(
+                      (open) => !open
+                    )
+                  }
+                >
+                  <span className="menu-check" />
+                  <span>Theme</span>
+                  <span className="submenu-arrow">
+                    ▶
+                  </span>
+                </button>
+
+                {themeMenuOpen && (
+                  <div className="menu-dropdown theme-submenu">
+                    <button
+                      type="button"
+                      className="menu-check-item"
+                      onClick={() => {
+                        onThemeChange("classic");
+                        setThemeMenuOpen(false);
+                      }}
+                    >
+                      <span className="menu-check">
+                        {theme === "classic" ? "✓" : ""}
+                      </span>
+                      <span>Classic</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="menu-check-item"
+                      onClick={() => {
+                        onThemeChange("bubblegum");
+                        setThemeMenuOpen(false);
+                      }}
+                    >
+                      <span className="menu-check">
+                        {theme === "bubblegum" ? "✓" : ""}
+                      </span>
+                      <span>Bubblegum</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      className="menu-check-item"
+                      onClick={() => {
+                        onThemeChange("nature");
+                        setThemeMenuOpen(false);
+                      }}
+                    >
+                      <span className="menu-check">
+                        {theme === "nature" ? "✓" : ""}
+                      </span>
+                      <span>Nature</span>
+                    </button>
+                  </div>
+                )}
+              </div>
             </div>
           )}
         </div>

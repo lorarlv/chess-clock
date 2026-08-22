@@ -1,3 +1,49 @@
+:root,
+[data-theme="classic"] {
+  --desktop-bg: #b8b5a8;
+
+  --window-bg: #b8b5a8;
+  --panel-bg: #aaa;
+  --panel-active-bg: #c8c3ad;
+  --setup-bg: #b9b9b9;
+
+  --title-bg: #173353;
+  --title-text: #fff;
+
+  --button-bg: #c7c7c7;
+  --button-text: #111;
+  --button-disabled: #777;
+
+  --menu-hover: #aaa;
+  --menu-active: #999;
+
+  --border-light: #fff;
+  --border-mid: #777;
+  --border-dark: #555;
+  --border-panel-dark: #666;
+
+  --text-main: #111;
+  --text-muted: #454545;
+
+  --lcd-bg: #151813;
+  --lcd-text: #c9d8a0;
+  --lcd-shadow: #536246;
+  --lcd-border-dark: #55584f;
+  --lcd-border-light: #d7d5c9;
+
+  --indicator-off: #65655f;
+  --indicator-on: #d5b947;
+
+  --white-piece: #fffdf0;
+  --black-piece: #171717;
+
+  --dialog-bg: #c7c7c7;
+  --dialog-message-bg: #b8b8b8;
+
+  --winner-bg: #111;
+  --winner-text: #e7e7e7;
+}
+
 * {
   box-sizing: border-box;
 }
@@ -12,7 +58,7 @@ body {
   margin: 0;
   font-family: "Courier New", monospace;
   overflow: hidden;
-  background: #b8b5a8;
+  background: var(--desktop-bg);
 }
 
 button,

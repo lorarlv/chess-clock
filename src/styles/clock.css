@@ -2,13 +2,13 @@
 .player-button {
   padding: 8px 14px;
 
-  border-top: 2px solid #fff;
-  border-left: 2px solid #fff;
-  border-right: 2px solid #555;
-  border-bottom: 2px solid #555;
+  border-top: 2px solid var(--border-light);
+  border-left: 2px solid var(--border-light);
+  border-right: 2px solid var(--border-dark);
+  border-bottom: 2px solid var(--border-dark);
 
-  background: #c7c7c7;
-  color: #111;
+  background: var(--button-bg);
+  color: var(--button-text);
   font-size: 0.8rem;
   font-weight: 700;
   cursor: pointer;
@@ -24,7 +24,7 @@
 
 .retro-button:disabled,
 .player-button:disabled {
-  color: #777;
+  color: var(--button-disabled);
   cursor: not-allowed;
 }
 
@@ -48,7 +48,7 @@
 }
 
 .pixel-icon.white-king .pixel.filled {
-  background: #fffdf0;
+  background: var(--white-piece);
 }
 
 .pixel-icon.white-king {
@@ -58,7 +58,7 @@
 }
 
 .pixel-icon.black-king .pixel.filled {
-  background: #171717;
+  background: var(--black-piece);
 }
 
 .pixel-icon.app {
@@ -90,19 +90,19 @@
 .player-panel {
   padding: 24px;
 
-  border-top: 2px solid #fff;
-  border-left: 2px solid #fff;
-  border-right: 2px solid #666;
-  border-bottom: 2px solid #666;
+  border-top: 2px solid var(--border-light);
+  border-left: 2px solid var(--border-light);
+  border-right: 2px solid var(--border-panel-dark);
+  border-bottom: 2px solid var(--border-panel-dark);
 
-  background: #aaa;
+  background: var(--panel-bg);
   text-align: center;
   display: flex;
   flex-direction: column;
 }
 
 .player-panel.active {
-  background: #c8c3ad;
+  background: var(--panel-active-bg);
 }
 
 .player-label {
@@ -125,14 +125,14 @@
   height: 7px;
   border: 1px solid #444;
   border-radius: 50%;
-  background: #65655f;
+  background: var(--indicator-off);
   box-shadow: inset 1px 1px 1px rgba(0, 0, 0, 0.6);
 }
 
 .status-light.on {
-  background: #d5b947;
+  background: var(--indicator-on);
   box-shadow:
-    0 0 3px #d5b947,
+    0 0 3px var(--indicator-on),
     inset 1px 1px 1px rgba(255, 255, 255, 0.5);
 }
 
@@ -145,13 +145,13 @@
   min-height: 130px;
   padding: 18px 12px;
 
-  border-top: 4px solid #55584f;
-  border-left: 4px solid #55584f;
-  border-right: 4px solid #d7d5c9;
-  border-bottom: 4px solid #d7d5c9;
+  border-top: 4px solid var(--lcd-border-dark);
+  border-left: 4px solid var(--lcd-border-dark);
+  border-right: 4px solid var(--lcd-border-light);
+  border-bottom: 4px solid var(--lcd-border-light);
 
-  background: #151813;
-  color: #c9d8a0;
+  background: var(--lcd-bg);
+  color: var(--lcd-text);
   font-family: "Lucida Console", "Courier New", monospace;
   font-size: clamp(3rem, 8vw, 5.5rem);
   font-weight: 700;
@@ -179,7 +179,7 @@
   opacity: 1;
   filter: none;
   transform: none;
-  text-shadow: 2px 0 #536246;
+  text-shadow: 2px 0 var(--lcd-shadow);
 }
 
 .player-status {

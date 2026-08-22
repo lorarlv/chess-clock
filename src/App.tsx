@@ -1,4 +1,5 @@
 import "./App.css";
+import type { Theme } from "./types/theme";
 
 import { getCurrentWindow } from "@tauri-apps/api/window";
 import { LogicalSize } from "@tauri-apps/api/dpi";
@@ -19,7 +20,6 @@ import {
 import type {
   CrashPhase,
 } from "./utils/pressure";
-
 
 type Player = "white" | "black";
 
@@ -60,6 +60,8 @@ function App() {
   const turnStartTime = useRef<number | null>(null);
 
   const [visualEffects, setVisualEffects] = useState(true);
+
+  const [theme, setTheme] = useState<Theme>("classic");
 
   useEffect(() => {
     const resizeWindow = async () => {
@@ -418,7 +420,10 @@ function App() {
 
 
   return (
-    <main className="desktop">
+    <main 
+      className="desktop"
+      data-theme={theme}
+    >
       <WindowChrome
         timeControlLabel={timeControlLabel}
         status={gameStatus}
@@ -442,6 +447,8 @@ function App() {
           activePlayer !== null &&
           winner === null
         }
+        theme={theme}
+        onThemeChange={setTheme}
       >
         <div className="window-content">
           {activePlayer === null &&
