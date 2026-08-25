@@ -2,7 +2,10 @@ import PixelIcon from "./pixel";
 
 import { formatTime } from "../utils/formatTime";
 
-import type { CrashPhase, PressureState } from "../utils/pressure";
+import type {
+  CrashPhase,
+  PressureState,
+} from "../utils/pressure";
 
 type Player = "white" | "black";
 
@@ -37,11 +40,6 @@ function Clock({
 }: ClockProps) {
   const isWhite = player === "white";
 
-  const hasLostOnTime =
-    isWhite
-      ? winner === "black"
-      : winner === "white";
-
   const label =
     isWhite
       ? "WHITE"
@@ -57,6 +55,16 @@ function Clock({
       ? "white-king"
       : "black-king";
 
+  const hasLostOnTime =
+    winner !== null &&
+    winner !== player;
+
+  const hasWon =
+    winner === player;
+
+  const gameOver =
+    winner !== null;
+
   return (
     <section
       className={`player-panel ${
@@ -67,6 +75,10 @@ function Clock({
           : ""
       } ${
         isActive ? "active" : ""
+      } ${
+        hasWon ? "winner" : ""
+      } ${
+        hasLostOnTime ? "loser" : ""
       }`}
     >
       <div className="player-label">
@@ -91,17 +103,30 @@ function Clock({
         {status}
       </div>
 
-      <button
-        className="player-button"
-        onClick={onMove}
-        disabled={
-          !isActive ||
-          isPaused ||
-          winner !== null
-        }
-      >
-        [ {key} ] {label} MOVED
-      </button>
+      {gameOver ? (
+        <div
+          className={`player-result ${
+            hasWon
+              ? "player-result-winner"
+              : "player-result-loser"
+          }`}
+        >
+          {hasWon
+            ? `${label} WINS`
+            : "TIME'S UP"}
+        </div>
+      ) : (
+        <button
+          className="player-button"
+          onClick={onMove}
+          disabled={
+            !isActive ||
+            isPaused
+          }
+        >
+          [ {key} ] {label} MOVED
+        </button>
+      )}
     </section>
   );
 }

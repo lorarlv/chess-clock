@@ -7,17 +7,26 @@ import type { ReactNode } from "react";
 
 import PixelIcon from "./pixel";
 
-const appWindow = getCurrentWindow();
+const isTauri =
+  typeof window !== "undefined" &&
+  "__TAURI_INTERNALS__" in window;
+
+const appWindow = isTauri
+  ? getCurrentWindow()
+  : null;
 
 async function minimizeWindow() {
+  if(!appWindow) return;
   await appWindow.minimize();
 }
 
 async function toggleMaximizeWindow() {
+  if(!appWindow) return;
   await appWindow.toggleMaximize();
 }
 
 async function startNativeDrag() {
+  if(!appWindow) return;
   await appWindow.startDragging();
 }
 
@@ -81,19 +90,25 @@ function WindowChrome({
       return;
     }
 
+    if(!appWindow) return;
     await appWindow.destroy();
   }
 
   async function confirmClose() {
     setShowCloseConfirm(false);
+    if(!appWindow) return;
     await appWindow.destroy();
   }
 
   useEffect(() => {
+    if(!appWindow) return;
+    
     appWindow.isAlwaysOnTop().then(setAlwaysOnTop);
   }, []);
 
   async function toggleAlwaysOnTop() {
+    if(!appWindow) return;
+
     const nextValue = !alwaysOnTop;
 
     await appWindow.setAlwaysOnTop(nextValue);
@@ -101,6 +116,8 @@ function WindowChrome({
   }
 
   useEffect(() => {
+    if(!appWindow) return;
+
     let unlisten: (() => void) | undefined;
 
     appWindow.onCloseRequested((event) => {
@@ -144,7 +161,11 @@ function WindowChrome({
   }, []);
 
   useEffect(() => {
-    if (openDialog !== "about" || !visualEffects) {
+    if (
+      openDialog !== "about" ||
+      !visualEffects ||
+      theme !== "classic"
+    ) {
       setAboutGlitch(null);
       return;
     }
@@ -190,7 +211,7 @@ function WindowChrome({
       clearTimeout(glitchTimeout);
       clearTimeout(resetTimeout);
     };
-  }, [openDialog, visualEffects]);
+  }, [openDialog, visualEffects, theme]);
 
   return (
     <div className="clock-window">
@@ -525,6 +546,49 @@ function WindowChrome({
                 </>
               ) : (
                 <>
+                {theme === "bubblegum" ? (
+                  <>
+                    <p className="about-heading">
+                      <strong>CHESS CLOCK</strong>
+                    </p>
+                    
+                    <p className="about-version">
+                      Version 1.0
+                    </p>
+                    
+                    <div className="about-diagnostics bubblegum-about-diagnostics">
+                      <span>Style engine</span>
+                      <span>BUBBLEGUM</span>
+                      
+                      <span>Display mode</span>
+                      <span>CANDY GLASS</span>
+
+                      <span>Clock sync</span>
+                      <span>PERFECT</span>
+                      
+                      <span>Sparkle level</span>
+                      <span>100%</span>
+                      
+                      <span>Bubble status</span>
+                      <span>STABLE</span>
+                      
+                      <span>Mood</span>
+                      <span>CUTE</span>
+                      
+                      <span>Time remaining</span>
+                      <span>???</span>
+                    </div>
+                    
+                    <p className="about-system-message bubblegum-about-system-message">
+                      EVERYTHING IS FINE :3
+                    </p>
+                    
+                    <p className="about-warning bubblegum-about-warning">
+                      HAVE FUN N DON'T BE LATE!
+                    </p>
+                  </>
+                ) : (
+                <>
                   <p><strong>CHESS CLOCK</strong></p>
                   <p>Version 1.0</p>
                   
@@ -574,13 +638,15 @@ function WindowChrome({
                   </p>
                 </>
               )}
-              <button
-                type="button"
-                className="retro-button dialog-ok"
-                onClick={() => setOpenDialog(null)}
-              >
-                OK
-              </button>
+                  <button
+                    type="button"
+                    className="retro-button dialog-ok"
+                    onClick={() => setOpenDialog(null)}
+                  >
+                    OK
+                  </button>
+                </>
+              )}
             </div>
           </div>
         </div>

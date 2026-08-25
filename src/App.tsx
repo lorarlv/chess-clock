@@ -23,7 +23,6 @@ import type {
 
 type Player = "white" | "black";
 
-
 const timeControls: TimeControl[] = [
   { label: "1+0", minutes: 1, increment: 0 },
   { label: "3+0", minutes: 3, increment: 0 },
@@ -35,9 +34,14 @@ const timeControls: TimeControl[] = [
   { label: "Custom", minutes: 0, increment: 0 },
 ];
 
-
 function App() {
-  const appWindow = getCurrentWindow();
+  const isTauri =
+    typeof window!== "undefined" &&
+    "__TAURI_INTERNALS__" in window;
+
+  const appWindow = isTauri
+    ? getCurrentWindow()
+    : null;
 
   const [initialTime, setInitialTime] = useState(5 * 60);
   const [increment, setIncrement] = useState(0);
@@ -64,6 +68,8 @@ function App() {
   const [theme, setTheme] = useState<Theme>("classic");
 
   useEffect(() => {
+    if (!appWindow) return;
+
     const resizeWindow = async () => {
       const isMaximized =
         await appWindow.isMaximized();
@@ -119,7 +125,6 @@ function App() {
     setBlackTime(startingTime);
   }
 
-
   function applyCustomTimeControl() {
     if (activePlayer !== null) {
       return;
@@ -137,7 +142,6 @@ function App() {
     setWhiteTime(startingTime);
     setBlackTime(startingTime);
   }
-
 
   function switchTurn(player: Player) {
     if (
@@ -165,7 +169,6 @@ function App() {
     }
   }
 
-
   function togglePause() {
     if (
       activePlayer === null ||
@@ -179,7 +182,6 @@ function App() {
     );
   }
 
-
   function resetGame() {
     setActivePlayer(null);
     setIsPaused(false);
@@ -191,7 +193,6 @@ function App() {
 
     turnStartTime.current = null;
   }
-
 
   useEffect(() => {
     if (
@@ -280,7 +281,6 @@ function App() {
     winner,
     visualEffects,
   ]);
-
 
   useEffect(() => {
     function handleKeyDown(event: KeyboardEvent) {
@@ -374,7 +374,6 @@ function App() {
     winner,
   ]);
 
-
   const whitePressure = getPressureState(
     whiteTime,
     activePlayer === "white" && !isPaused,
@@ -387,14 +386,14 @@ function App() {
     winner === "white"
   );
 
-
   const whiteStatus = getPlayerStatus(
     whiteTime,
     activePlayer === "white",
     isPaused,
     winner === "black",
     crashPhase,
-    visualEffects
+    visualEffects,
+    theme
   );
 
   const blackStatus = getPlayerStatus(
@@ -403,9 +402,9 @@ function App() {
     isPaused,
     winner === "white",
     crashPhase,
-    visualEffects
+    visualEffects,
+    theme
   );
-
 
   const timeControlLabel =
     `${Math.round(initialTime / 60)}+${increment}`;
@@ -417,7 +416,6 @@ function App() {
       : activePlayer
         ? "GAME IN PROGRESS"
         : "READY";
-
 
   return (
     <main 
