@@ -1,5 +1,6 @@
 import PixelIcon from "./pixel";
 import NatureEffects from "./natureEffects";
+import BubblegumEffects from "./bubblegumEffects";
 
 import { formatTime } from "../utils/formatTime";
 
@@ -96,10 +97,16 @@ function Clock({
 
       <div className="clock-display">
         {visualEffects && (
-          <NatureEffects
-            time={time}
-            hasLostOnTime={hasLostOnTime}
-          />
+          <>
+            <NatureEffects
+              time={time}
+              hasLostOnTime={hasLostOnTime}
+            />
+
+            <BubblegumEffects
+              time={time}
+            />
+          </>
         )}
 
         <span className="clock-value">

@@ -476,6 +476,10 @@ function App() {
                   ? winner === "white"
                     ? "WHITE REMAINS"
                     : "BLACK REMAINS"
+                  : theme === "bubblegum"
+                    ? winner === "white"
+                      ? "WHITE TAKES THE CAKE"
+                      : "BLACK TAKES THE CAKE"
                   : winner === "white"
                     ? "WHITE_WINS_ON_TIME"
                     : "BLACK_WINS_ON_TIME"}
