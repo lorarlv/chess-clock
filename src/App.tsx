@@ -410,7 +410,9 @@ function App() {
     `${Math.round(initialTime / 60)}+${increment}`;
 
   const gameStatus = winner
-    ? "GAME OVER"
+    ? theme === "nature"
+      ? "CYCLE COMPLETE"
+      : "GAME OVER"
     : isPaused
       ? "PAUSED"
       : activePlayer
@@ -470,9 +472,13 @@ function App() {
           {winner &&
             crashPhase === "settled" && (
               <div className="winner-message">
-                {winner === "white"
-                  ? "WHITE_WINS_ON_TIME"
-                  : "BLACK_WINS_ON_TIME"}
+                {theme === "nature"
+                  ? winner === "white"
+                    ? "WHITE REMAINS"
+                    : "BLACK REMAINS"
+                  : winner === "white"
+                    ? "WHITE_WINS_ON_TIME"
+                    : "BLACK_WINS_ON_TIME"}
               </div>
             )}
 
@@ -507,6 +513,11 @@ function App() {
               }
             />
           </div>
+
+          <div
+            className="nature-meadow"
+            aria-hidden="true"
+          />
 
           <div className="control-row">
             {activePlayer === null &&

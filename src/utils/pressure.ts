@@ -308,18 +308,11 @@ function getBubblegumStatus(
   isActive: boolean,
   isPaused: boolean,
   hasTimedOut: boolean,
-  crashPhase: CrashPhase,
   visualEffects: boolean
 ): string {
   if (hasTimedOut) {
     if (!visualEffects) {
       return "TIME'S UP";
-    }
-
-    if (
-      crashPhase === "burst"
-    ) {
-      return "POP!";
     }
 
     return "POP!";
@@ -369,18 +362,50 @@ function getNatureStatus(
   isActive: boolean,
   isPaused: boolean,
   hasTimedOut: boolean,
-  crashPhase: CrashPhase,
+  _crashPhase: CrashPhase,
   visualEffects: boolean
 ): string {
+  if (hasTimedOut) {
+    if (!visualEffects) {
+      return "TIME EXPIRED";
+    }
 
-  return getClassicStatus(
-    time,
-    isActive,
-    isPaused,
-    hasTimedOut,
-    crashPhase,
-    visualEffects
-  );
+    return "RECLAIMED";
+  }
+
+  if (!isActive) {
+    return "WAITING";
+  }
+
+  if (isPaused) {
+    return "PAUSED";
+  }
+
+  if (!visualEffects) {
+    if (time <= 7) {
+      return "TIME CRITICAL";
+    }
+
+    if (time <= 30) {
+      return "TIME IS RUNNING OUT";
+    }
+
+    return "YOUR MOVE";
+  }
+
+  if (time <= 7) {
+    return "CONTROL LOST";
+  }
+
+  if (time <= 15) {
+    return "SYSTEM OVERRUN";
+  }
+
+  if (time <= 30) {
+    return "GROWTH DETECTED";
+  }
+
+  return "YOUR MOVE";
 }
 
 /* =========================================================
@@ -402,7 +427,6 @@ export function getPlayerStatus(
       isActive,
       isPaused,
       hasTimedOut,
-      crashPhase,
       visualEffects
     );
   }

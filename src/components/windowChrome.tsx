@@ -587,6 +587,46 @@ function WindowChrome({
                       HAVE FUN N DON'T BE LATE!
                     </p>
                   </>
+
+                ) : theme === "nature" ? (
+                  <>
+                    <p className="about-heading nature-about-heading">
+                      <strong>CHESS CLOCK</strong>
+                    </p>
+
+                    <p className="about-version nature-about-version">
+                      Version 1.0
+                    </p>
+
+                    <div className="about-diagnostics nature-about-diagnostics">
+                      <span>Environment</span>
+                      <span>UNCONTROLLED</span>
+
+                      <span>Growth detected</span>
+                      <span>YES</span>
+
+                      <span>System integrity</span>
+                      <span>COMPROMISED</span>
+
+                      <span>Display condition</span>
+                      <span>DEGRADING</span>
+
+                      <span>Root access</span>
+                      <span>ESTABLISHED</span>
+
+                      <span>Recovery status</span>
+                      <span>UNLIKELY</span>
+                    </div>
+
+                    <p className="about-system-message nature-about-system-message">
+                      NATURAL PROCESSES ACTIVE
+                    </p>
+
+                    <p className="about-warning nature-about-warning">
+                      DO NOT DISTURB
+                    </p>
+                  </>
+                  
                 ) : (
                 <>
                   <p><strong>CHESS CLOCK</strong></p>
