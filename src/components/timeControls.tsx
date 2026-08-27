@@ -1,3 +1,8 @@
+import {
+  useEffect,
+  useState,
+} from "react";
+
 type TimeControl = {
   label: string;
   minutes: number;
@@ -26,6 +31,69 @@ function TimeControls({
   onCustomIncrementChange,
   onApplyCustom,
 }: TimeControlsProps) {
+  const [minutesInput, setMinutesInput] = useState(
+    String(customMinutes)
+  );
+
+  const [incrementInput, setIncrementInput] = useState(
+    String(customIncrement)
+  );
+
+  useEffect(() => {
+    setMinutesInput(
+      String(customMinutes)
+    );
+  }, [customMinutes]);
+
+  useEffect(() => {
+    setIncrementInput(
+      String(customIncrement)
+    );
+  }, [customIncrement]);
+
+  function handleMinutesChange(
+    value: string
+  ) {
+    if (!/^\d*$/.test(value)) {
+      return;
+    }
+
+    setMinutesInput(value);
+
+    if (value !== "") {
+      onCustomMinutesChange(
+        Number(value)
+      );
+    }
+  }
+
+  function handleIncrementChange(
+    value: string
+  ) {
+    if (!/^\d*$/.test(value)) {
+      return;
+    }
+
+    setIncrementInput(value);
+
+    if (value !== "") {
+      onCustomIncrementChange(
+        Number(value)
+      );
+    }
+  }
+
+  function applyCustom() {
+    if (
+      minutesInput === "" ||
+      incrementInput === ""
+    ) {
+      return;
+    }
+
+    onApplyCustom();
+  }
+
   return (
     <div className="setup-panel">
       <h2>Time control</h2>
@@ -40,42 +108,60 @@ function TimeControls({
             {control.label}
           </button>
         ))}
+
+        {isCustom && (
+          <div className="custom-controls">
+            <label>
+              Minutes
+              <input
+                type="text"
+                inputMode="numeric"
+                value={minutesInput}
+                onChange={(event) =>
+                  handleMinutesChange(
+                    event.target.value
+                  )
+                }
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    applyCustom();
+                  }
+                }}
+              />
+            </label>
+
+            <label>
+              Increment
+              <input
+                type="text"
+                inputMode="numeric"
+                value={incrementInput}
+                onChange={(event) =>
+                  handleIncrementChange(
+                    event.target.value
+                  )
+                }
+                onKeyDown={(event) => {
+                  if (event.key === "Enter") {
+                    applyCustom();
+                  }
+                }}
+              />
+            </label>
+
+            <button
+              className="retro-button"
+              onClick={applyCustom}
+              disabled={
+                minutesInput === "" ||
+                incrementInput === ""
+              }
+            >
+              Apply
+            </button>
+          </div>
+        )}
       </div>
-
-      {isCustom && (
-        <div className="custom-controls">
-          <label>
-            Minutes
-            <input
-              type="number"
-              min={1}
-              value={customMinutes}
-              onChange={(event) =>
-                onCustomMinutesChange(Number(event.target.value))
-              }
-            />
-          </label>
-
-          <label>
-            Increment
-            <input
-              type="number"
-              min={0}
-              value={customIncrement}
-              onChange={(event) =>
-                onCustomIncrementChange(Number(event.target.value))
-              }
-            />
-          </label>
-
-          <button
-            className="retro-button"
-            onClick={onApplyCustom}
-          >
-            Apply
-          </button>
-        </div>
-      )}
     </div>
   );
 }
