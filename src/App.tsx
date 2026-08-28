@@ -34,6 +34,36 @@ const timeControls: TimeControl[] = [
   { label: "Custom", minutes: 0, increment: 0 },
 ];
 
+type SavedTimeControl = {
+  minutes: number;
+  increment: number;
+  isCustom: boolean;
+};
+
+function getSavedTimeControl(): SavedTimeControl {
+  const saved = localStorage.getItem(
+    "chessclock-time-control"
+  );
+
+  if (!saved) {
+    return {
+      minutes: 5,
+      increment: 0,
+      isCustom: false,
+    };
+  }
+
+  try {
+    return JSON.parse(saved);
+  } catch {
+    return {
+      minutes: 5,
+      increment: 0,
+      isCustom: false,
+    };
+  }
+}
+
 function App() {
   const isTauri =
     typeof window!== "undefined" &&
@@ -43,8 +73,11 @@ function App() {
     ? getCurrentWindow()
     : null;
 
-  const [initialTime, setInitialTime] = useState(5 * 60);
-  const [increment, setIncrement] = useState(0);
+
+  const [savedTimeControl] = useState(getSavedTimeControl);
+
+  const [initialTime, setInitialTime] = useState(savedTimeControl.minutes * 60);
+  const [increment, setIncrement] = useState(savedTimeControl.increment);
 
   const [whiteTime, setWhiteTime] = useState(initialTime);
   const [blackTime, setBlackTime] = useState(initialTime);
@@ -57,9 +90,9 @@ function App() {
 
   const [crashPhase, setCrashPhase] = useState<CrashPhase>("idle");
 
-  const [isCustom, setIsCustom] = useState(false);
-  const [customMinutes, setCustomMinutes] = useState(5);
-  const [customIncrement, setCustomIncrement] = useState(0);
+  const [isCustom, setIsCustom] = useState(savedTimeControl.isCustom);
+  const [customMinutes, setCustomMinutes] = useState(savedTimeControl.minutes);
+  const [customIncrement, setCustomIncrement] = useState(savedTimeControl.increment);
 
   const turnStartTime = useRef<number | null>(null);
 
@@ -123,6 +156,15 @@ function App() {
 
     setWhiteTime(startingTime);
     setBlackTime(startingTime);
+
+    localStorage.setItem(
+      "chessclock-time-control",
+      JSON.stringify({
+        minutes: control.minutes,
+        increment: control.increment,
+        isCustom: false,
+      })
+    );
   }
 
   function applyCustomTimeControl() {
@@ -141,6 +183,15 @@ function App() {
 
     setWhiteTime(startingTime);
     setBlackTime(startingTime);
+
+    localStorage.setItem(
+      "chessclock-time-control",
+      JSON.stringify({
+        minutes: Math.max(customMinutes, 1),
+        increment: customIncrementValue,
+        isCustom: true,
+      })
+    );
   }
 
   function switchTurn(player: Player) {
