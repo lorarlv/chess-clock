@@ -4,6 +4,20 @@ A desktop chess clock built with React, TypeScript, and Tauri.
 
 ---
 
+## Installation
+Download the latest Windows installer from the [Releases](../../releases) page and run it to install the app.
+
+## Screenshots
+
+### Classic
+![Classic theme](screenshots/classic.png)
+
+### Bubblegum
+![Bubblegum theme](screenshots/bubblegum.png)
+
+### Nature
+![Nature theme](screenshots/nature.png)
+
 ## Features
 - two-player chess clock
 - preset and custom time controls
@@ -11,6 +25,8 @@ A desktop chess clock built with React, TypeScript, and Tauri.
 - pause and resume buttons
 - timeout handling
 - low-time precision with visual feedback
+- optional visual effects
+- three distinct themes
 - keyboard controls
 - native desktop window controls
 - responsive window sizing
@@ -35,6 +51,17 @@ The clock includes multiple presets:
 
 There is also the option to configure custom time controls with a starting time and a Fischer increment.
 
+## Themes
+
+### Classic
+A retro desktop-inspired chess clock with digital displays and system-style VFX.
+
+### Bubblegum
+A colorful Y2K-inspired theme with glossy UI elements and bubble effects.
+
+### Nature
+An overgrown retro interface with progressive degradation.
+
 ## Tech stack
 - React
 - TypeScript
@@ -48,7 +75,7 @@ Install dependencies:
 npm install
 ```
 
-Run the dektop app in development:
+Run the desktop app in development:
 ```bash
 npm run tauri dev
 ```
