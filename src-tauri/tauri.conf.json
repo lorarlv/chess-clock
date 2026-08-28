@@ -13,10 +13,10 @@
     "windows": [
       {
         "title": "chessclock.exe",
-        "width": 1120,
-        "height": 800,
-        "minWidth": 900,
-        "minHeight": 650,
+        "width": 900,
+        "height": 650,
+        "minWidth": 700,
+        "minHeight": 645,
         "resizable": true,
         "decorations": false
       }

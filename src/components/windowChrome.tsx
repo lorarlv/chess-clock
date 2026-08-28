@@ -226,6 +226,11 @@ function WindowChrome({
             return;
           }
 
+          if (event.detail === 2) {
+            toggleMaximizeWindow();
+            return;
+          }
+
           startNativeDrag();
         }}
       >

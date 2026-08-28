@@ -426,8 +426,9 @@
 .control-row {
   display: flex;
   justify-content: center;
-  gap: 12px;
+  gap: 8px;
   margin-top: 20px;
+  margin-right: 38px;
 }
 
 .status-bar {
