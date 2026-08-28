@@ -9,14 +9,11 @@ Download the latest Windows installer from the [Releases](../../releases) page a
 
 ## Screenshots
 
-### Classic
-![Classic theme](screenshots/classic.png)
-
-### Bubblegum
-![Bubblegum theme](screenshots/bubblegum.png)
-
-### Nature
-![Nature theme](screenshots/nature.png)
+<p align="center">
+    <img src="screenshots/classic.png" alt="Classic theme" width="32%">
+    <img src="screenshots/bubblegum.png" alt="Bubblegum theme" width="32%">
+    <img src="screenshots/nature.png" alt="Nature theme" width="32%">
+</p>
 
 ## Features
 - two-player chess clock
